@@ -243,6 +243,7 @@
         <!-- ── API & Anbieter ── -->
         {#if activeTab === 'api'}
           <h1>API & Anbieter</h1>
+          <p class="page-desc">Verbinde Rewrite mit deinem bevorzugten KI-Anbieter.</p>
 
           <section class="card">
             <div class="field-label">Anbieter</div>
@@ -275,7 +276,7 @@
                 </button>
               </div>
 
-              <div class="field-label" style="margin-top: 16px;">Modell</div>
+              <div class="field-label" style="margin-top: 20px;">Modell</div>
               <select
                 class="select"
                 value={appState.settings.openaiModel}
@@ -321,7 +322,7 @@
                 onchange={(e) => saveOllamaEndpoint(e.currentTarget.value)}
               />
 
-              <div class="field-label" style="margin-top: 16px;">Modell</div>
+              <div class="field-label" style="margin-top: 20px;">Modell</div>
               <div class="input-row">
                 <input
                   class="text-input"
@@ -384,6 +385,7 @@
         <!-- ── Auto-Modus ── -->
         {#if activeTab === 'automode'}
           <h1>Auto-Modus</h1>
+          <p class="page-desc">Seiten werden automatisch umformuliert, sobald du sie öffnest.</p>
 
           <section class="card">
             <div class="toggle-row">
@@ -444,6 +446,7 @@
         <!-- ── Bekanntes Wissen ── -->
         {#if activeTab === 'knowledge'}
           <h1>Bekanntes Wissen</h1>
+          <p class="page-desc">Dein Profil wird beim Umformulieren als Kontext an das Modell übergeben.</p>
 
           <section class="card">
             <div class="toggle-row">
@@ -508,7 +511,7 @@
         bind:value={editStyle.name}
       />
 
-      <div class="field-label" style="margin-top: 16px;">Dimensionen</div>
+      <div class="field-label" style="margin-top: 20px;">Dimensionen</div>
       {#each DIMS as dim}
         <div class="dim-row">
           <div class="dim-header">
@@ -526,7 +529,7 @@
         </div>
       {/each}
 
-      <div class="field-label" style="margin-top: 16px;">Vorlage</div>
+      <div class="field-label" style="margin-top: 20px;">Vorlage</div>
       <div class="chips">
         {#each TEMPLATES as t}
           <button
@@ -539,7 +542,7 @@
         {/each}
       </div>
 
-      <div class="field-label" style="margin-top: 16px;">Eigene Anweisungen <span class="field-hint-inline">(optional, max. 2000 Zeichen)</span></div>
+      <div class="field-label" style="margin-top: 20px;">Eigene Anweisungen <span class="field-hint-inline">(optional, max. 2000 Zeichen)</span></div>
       <textarea
         class="textarea"
         rows="4"
@@ -575,7 +578,7 @@
   }
 
   .loading {
-    padding: 64px;
+    padding: 80px;
     text-align: center;
     color: #6c7086;
     font-size: 14px;
@@ -588,23 +591,24 @@
   }
 
   .sidebar {
-    width: 220px;
+    width: 260px;
     flex-shrink: 0;
     background: #181825;
     border-right: 1px solid #313244;
-    padding: 24px 16px;
+    padding: 32px 20px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
   }
 
   .app-name {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     color: #cdd6f4;
-    padding: 0 8px 16px;
+    letter-spacing: -0.01em;
+    padding: 0 12px 20px;
     border-bottom: 1px solid #313244;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
 
   .nav-item {
@@ -612,8 +616,9 @@
     font-family: inherit;
     font-size: 14px;
     color: #a6adc8;
-    padding: 8px 10px;
-    border-radius: 6px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border-left: 3px solid transparent;
     cursor: pointer;
     transition: background 0.12s, color 0.12s;
     display: block;
@@ -622,37 +627,49 @@
   }
 
   .nav-item:hover {
-    background: #313244;
+    background: rgba(49, 50, 68, 0.7);
     color: #cdd6f4;
   }
 
   .nav-item.active {
-    background: #313244;
+    background: rgba(137, 180, 250, 0.1);
     color: #89b4fa;
     font-weight: 600;
+    border-left-color: #89b4fa;
   }
 
   .content {
     flex: 1;
-    padding: 32px 40px;
-    max-width: 680px;
+    padding: 52px 64px;
+    max-width: 820px;
   }
 
   h1 {
     all: initial;
     font-family: system-ui, -apple-system, sans-serif;
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 700;
     color: #cdd6f4;
+    letter-spacing: -0.02em;
     display: block;
-    margin-bottom: 24px;
+    margin-bottom: 6px;
+  }
+
+  .page-desc {
+    all: initial;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    color: #6c7086;
+    display: block;
+    margin-bottom: 32px;
+    line-height: 1.5;
   }
 
   .tab-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 32px;
   }
 
   .tab-header h1 {
@@ -663,26 +680,26 @@
   .card {
     background: #181825;
     border: 1px solid #313244;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 16px;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
   }
 
   .field-label {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     color: #6c7086;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     display: block;
   }
 
   .field-hint {
-    font-size: 12px;
+    font-size: 13px;
     color: #6c7086;
-    margin-bottom: 10px;
-    line-height: 1.5;
+    margin-bottom: 14px;
+    line-height: 1.55;
   }
 
   .field-hint-inline {
@@ -696,8 +713,8 @@
   .field-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
+    gap: 10px;
+    margin-bottom: 12px;
   }
 
   .field-row .field-label {
@@ -714,8 +731,8 @@
     all: unset;
     font-family: inherit;
     font-size: 14px;
-    padding: 8px 20px;
-    border-radius: 6px;
+    padding: 9px 22px;
+    border-radius: 8px;
     border: 1px solid #313244;
     background: #1e1e2e;
     color: #a6adc8;
@@ -742,8 +759,8 @@
     background: #1e1e2e;
     color: #cdd6f4;
     border: 1px solid #313244;
-    border-radius: 6px;
-    padding: 9px 12px;
+    border-radius: 8px;
+    padding: 10px 14px;
     font-size: 14px;
     font-family: inherit;
   }
@@ -768,8 +785,8 @@
     background: #1e1e2e;
     color: #cdd6f4;
     border: 1px solid #313244;
-    border-radius: 6px;
-    padding: 9px 12px;
+    border-radius: 8px;
+    padding: 10px 14px;
     font-size: 14px;
     font-family: inherit;
     cursor: pointer;
@@ -787,8 +804,8 @@
     background: #1e1e2e;
     color: #cdd6f4;
     border: 1px solid #313244;
-    border-radius: 6px;
-    padding: 10px 12px;
+    border-radius: 8px;
+    padding: 12px 14px;
     font-size: 14px;
     font-family: inherit;
     resize: vertical;
@@ -808,8 +825,8 @@
     font-family: monospace;
     font-size: 12px;
     background: #313244;
-    padding: 1px 4px;
-    border-radius: 3px;
+    padding: 2px 5px;
+    border-radius: 4px;
     color: #cba6f7;
   }
 
@@ -818,8 +835,8 @@
     all: unset;
     cursor: pointer;
     font-size: 16px;
-    padding: 4px 6px;
-    border-radius: 4px;
+    padding: 6px 8px;
+    border-radius: 6px;
     flex-shrink: 0;
     line-height: 1;
   }
@@ -832,7 +849,7 @@
   .badge {
     font-size: 11px;
     font-weight: 600;
-    padding: 2px 7px;
+    padding: 3px 8px;
     border-radius: 99px;
     background: #313244;
     color: #a6adc8;
@@ -849,24 +866,24 @@
   .style-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
 
   .style-card {
     background: #181825;
     border: 1px solid #313244;
-    border-radius: 10px;
-    padding: 14px 16px;
+    border-radius: 12px;
+    padding: 18px 22px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 16px;
   }
 
   .style-info {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
     min-width: 0;
   }
 
@@ -884,7 +901,7 @@
 
   .style-actions {
     display: flex;
-    gap: 6px;
+    gap: 4px;
     flex-shrink: 0;
   }
 
@@ -896,8 +913,8 @@
     color: #1e1e2e;
     font-size: 14px;
     font-weight: 600;
-    padding: 9px 20px;
-    border-radius: 7px;
+    padding: 10px 22px;
+    border-radius: 8px;
     cursor: pointer;
     transition: background 0.15s;
   }
@@ -917,8 +934,8 @@
     background: #313244;
     color: #cdd6f4;
     font-size: 14px;
-    padding: 9px 20px;
-    border-radius: 7px;
+    padding: 10px 22px;
+    border-radius: 8px;
     cursor: pointer;
     transition: background 0.15s;
   }
@@ -932,8 +949,8 @@
     font-family: inherit;
     font-size: 13px;
     color: #89b4fa;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 6px 12px;
+    border-radius: 6px;
     cursor: pointer;
     transition: background 0.12s;
   }
@@ -955,7 +972,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-top: 12px;
+    margin-top: 16px;
   }
 
   .saved-msg {
@@ -974,7 +991,7 @@
     width: 100%;
     accent-color: #89b4fa;
     cursor: pointer;
-    margin-top: 6px;
+    margin-top: 8px;
   }
 
   .slider-labels {
@@ -982,7 +999,7 @@
     justify-content: space-between;
     font-size: 11px;
     color: #6c7086;
-    margin-top: 4px;
+    margin-top: 6px;
   }
 
   /* Toggle */
@@ -990,7 +1007,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 20px;
+    padding: 2px 0;
   }
 
   .toggle {
@@ -1027,7 +1045,7 @@
 
   /* Dim sliders */
   .dim-row {
-    margin-bottom: 10px;
+    margin-bottom: 16px;
   }
 
   .dim-row:last-child {
@@ -1038,7 +1056,7 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
   }
 
   .dim-label {
@@ -1056,14 +1074,14 @@
   .chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 8px;
   }
 
   .chip {
     all: unset;
     font-family: inherit;
-    font-size: 12px;
-    padding: 4px 12px;
+    font-size: 13px;
+    padding: 6px 14px;
     border-radius: 99px;
     border: 1px solid #313244;
     background: #1e1e2e;
@@ -1115,33 +1133,34 @@
   .dialog-inner {
     background: #1e1e2e;
     color: #cdd6f4;
-    border-radius: 12px;
-    padding: 28px;
-    width: min(90vw, 520px);
+    border-radius: 14px;
+    padding: 36px;
+    width: min(90vw, 560px);
     max-height: 88vh;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 0;
     font-family: system-ui, -apple-system, sans-serif;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.65);
   }
 
   h2 {
     all: initial;
     font-family: system-ui, -apple-system, sans-serif;
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 700;
     color: #cdd6f4;
+    letter-spacing: -0.01em;
     display: block;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
 
   .dialog-actions {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     justify-content: flex-end;
-    margin-top: 20px;
+    margin-top: 28px;
   }
 
   .dialog-inner .text-input,
