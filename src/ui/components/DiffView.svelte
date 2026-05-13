@@ -1,9 +1,11 @@
 <script lang="ts">
   import { computeWordDiff } from '../../../entrypoints/content/diffRenderer.ts';
+  import type { FidelityReport } from '../../messaging/types.ts';
 
   let {
     original,
     rewritten,
+    fidelity = undefined,
     onAccept,
     onDiscard,
     onChangeStyle,
@@ -11,11 +13,15 @@
   }: {
     original: string;
     rewritten: string;
+    fidelity?: FidelityReport;
     onAccept: () => void;
     onDiscard: () => void;
     onChangeStyle: () => void;
     onSave: () => void;
   } = $props();
+
+  let confirmedDespiteWarning = $state(false);
+  const canAccept = $derived(!fidelity || fidelity.passed || confirmedDespiteWarning);
 
   const diff = $derived(computeWordDiff(original, rewritten));
 
@@ -63,8 +69,30 @@
       </div>
     </div>
 
+    {#if fidelity && !fidelity.passed}
+      <div class="fidelity-warning">
+        <span class="warn-icon">⚠</span>
+        <div class="warn-content">
+          <strong>Mögliche Halluzination erkannt</strong>
+          <ul>
+            {#each fidelity.issues.filter((i) => i.severity === 'high') as issue}
+              <li>
+                {issue.type === 'invented_numbers'
+                  ? `Erfundene Zahlen: ${issue.detail.join(', ')}`
+                  : `Fehlende Zitate: ${issue.detail.join(', ')}`}
+              </li>
+            {/each}
+          </ul>
+          <label class="confirm-label">
+            <input type="checkbox" bind:checked={confirmedDespiteWarning} />
+            Ich habe das überprüft und möchte trotzdem übernehmen.
+          </label>
+        </div>
+      </div>
+    {/if}
+
     <div class="actions">
-      <button class="btn-primary" onclick={onAccept}>Übernehmen</button>
+      <button class="btn-primary" disabled={!canAccept} onclick={onAccept}>Übernehmen</button>
       <button class="btn-secondary" onclick={onDiscard}>Verwerfen</button>
       <button class="btn-secondary" onclick={onChangeStyle}>Style ändern</button>
       <button class="btn-secondary" onclick={onSave}>In Bibliothek speichern</button>
@@ -215,5 +243,67 @@
 
   .btn-secondary:hover {
     background: #45475a;
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .fidelity-warning {
+    display: flex;
+    gap: 12px;
+    background: rgba(243, 139, 168, 0.1);
+    border: 1px solid rgba(243, 139, 168, 0.4);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+  }
+
+  .warn-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    color: #f38ba8;
+  }
+
+  .warn-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .warn-content strong {
+    color: #f38ba8;
+    font-weight: 600;
+  }
+
+  .warn-content ul {
+    all: initial;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #cba6f7;
+    font-size: 13px;
+    padding-left: 16px;
+    list-style: disc;
+    display: block;
+  }
+
+  .warn-content li {
+    display: list-item;
+  }
+
+  .confirm-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #a6adc8;
+    cursor: pointer;
+  }
+
+  .confirm-label input[type='checkbox'] {
+    accent-color: #89b4fa;
+    width: 14px;
+    height: 14px;
   }
 </style>
