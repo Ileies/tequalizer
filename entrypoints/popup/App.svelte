@@ -1,7 +1,445 @@
 <script lang="ts">
+  import { getState, updateSettings } from '../../src/storage/storageAdapter.ts';
+  import { saveStyle } from '../../src/style-engine/library.ts';
+  import type { StoredState, StyleConfig } from '../../src/storage/schema.ts';
+
+  const TEMPLATES: Array<{ id: StyleConfig['template']; label: string }> = [
+    { id: 'none', label: 'Keins' },
+    { id: 'ted_talk', label: 'TED Talk' },
+    { id: 'bible', label: 'Bibel' },
+    { id: 'personal_letter', label: 'Brief' },
+    { id: 'academic', label: 'Akademisch' },
+    { id: 'tabloid', label: 'Boulevard' },
+  ];
+
+  const DIMS: Array<{
+    key: keyof StyleConfig['dimensions'];
+    label: string;
+    min: string;
+    max: string;
+  }> = [
+    { key: 'length', label: 'Länge', min: 'Kürzer', max: 'Länger' },
+    { key: 'imagery', label: 'Bildlichkeit', min: 'Sachlich', max: 'Bildhaft' },
+    { key: 'warmth', label: 'Wärme', min: 'Kalt', max: 'Warm' },
+    { key: 'formality', label: 'Formalität', min: 'Locker', max: 'Förmlich' },
+  ];
+
+  let appState = $state<StoredState | null>(null);
+  let triggering = $state(false);
+
+  $effect(() => {
+    getState().then((s) => {
+      appState = s;
+    });
+  });
+
+  const activeStyle = $derived(
+    appState
+      ? (appState.styleLibrary.find((s) => s.id === appState!.settings.activeStyleId) ?? null)
+      : null
+  );
+
+  async function onStyleChange(id: string) {
+    if (!appState) return;
+    await updateSettings({ activeStyleId: id });
+    appState = await getState();
+  }
+
+  async function onDimChange(key: keyof StyleConfig['dimensions'], value: number) {
+    if (!appState || !activeStyle) return;
+    const updated: StyleConfig = {
+      ...activeStyle,
+      dimensions: { ...activeStyle.dimensions, [key]: value },
+    };
+    await saveStyle(updated);
+    appState = await getState();
+  }
+
+  async function onTemplateClick(template: StyleConfig['template']) {
+    if (!appState || !activeStyle) return;
+    const updated: StyleConfig = { ...activeStyle, template };
+    await saveStyle(updated);
+    appState = await getState();
+  }
+
+  async function toggleAutoRewrite() {
+    if (!appState) return;
+    await updateSettings({
+      autoRewrite: {
+        ...appState.settings.autoRewrite,
+        enabled: !appState.settings.autoRewrite.enabled,
+      },
+    });
+    appState = await getState();
+  }
+
+  async function toggleKnowledge() {
+    if (!appState) return;
+    await updateSettings({
+      knownKnowledge: {
+        ...appState.settings.knownKnowledge,
+        enabled: !appState.settings.knownKnowledge.enabled,
+      },
+    });
+    appState = await getState();
+  }
+
+  async function triggerRewrite() {
+    if (!appState || triggering) return;
+    triggering = true;
+    try {
+      const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+      const tab = tabs[0];
+      if (tab?.id != null) {
+        await browser.tabs.sendMessage(tab.id, {
+          type: 'TRIGGER_REWRITE',
+          payload: { styleId: appState.settings.activeStyleId },
+        });
+        window.close();
+      }
+    } catch {
+      // Content script may not be injected on this page
+    } finally {
+      triggering = false;
+    }
+  }
+
+  function openOptions() {
+    browser.runtime.openOptionsPage();
+  }
 </script>
 
-<main class="p-4 w-[360px] min-h-[120px]">
-  <h1 class="text-xl font-bold text-gray-900">Rewrite</h1>
-  <p class="text-sm text-gray-500 mt-1">Texte in deinem Stil umformulieren.</p>
-</main>
+<div class="popup">
+  {#if !appState}
+    <div class="loading">Laden…</div>
+  {:else}
+    <header>
+      <span class="title">Rewrite</span>
+      <button class="icon-btn" onclick={openOptions} title="Einstellungen">⚙</button>
+    </header>
+
+    <div class="body">
+      <section class="section">
+        <label class="label" for="style-select">Style</label>
+        <select
+          id="style-select"
+          class="select"
+          value={appState.settings.activeStyleId}
+          onchange={(e) => onStyleChange(e.currentTarget.value)}
+        >
+          {#each appState.styleLibrary as style}
+            <option value={style.id}>{style.name}{style.builtIn ? ' ★' : ''}</option>
+          {/each}
+        </select>
+      </section>
+
+      {#if activeStyle}
+        <section class="section">
+          {#each DIMS as dim}
+            <div class="dim-row">
+              <div class="dim-header">
+                <span class="dim-label">{dim.label}</span>
+                <span class="dim-hints">{dim.min} → {dim.max}</span>
+              </div>
+              <input
+                type="range"
+                min="-1"
+                max="1"
+                step="0.05"
+                class="slider"
+                value={activeStyle.dimensions[dim.key]}
+                onchange={(e) => onDimChange(dim.key, Number(e.currentTarget.value))}
+              />
+            </div>
+          {/each}
+        </section>
+
+        <section class="section">
+          <div class="label">Vorlage</div>
+          <div class="chips">
+            {#each TEMPLATES as t}
+              <button
+                class="chip"
+                class:chip-active={activeStyle.template === t.id}
+                onclick={() => onTemplateClick(t.id)}
+              >
+                {t.label}
+              </button>
+            {/each}
+          </div>
+        </section>
+      {/if}
+
+      <section class="section toggles">
+        <div class="toggle-row">
+          <span class="toggle-label">Auto-Modus</span>
+          <button
+            class="toggle"
+            class:toggle-on={appState.settings.autoRewrite.enabled}
+            onclick={toggleAutoRewrite}
+            aria-pressed={appState.settings.autoRewrite.enabled}
+            aria-label="Auto-Modus"
+          >
+            <span class="toggle-thumb"></span>
+          </button>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Bekanntes Wissen</span>
+          <button
+            class="toggle"
+            class:toggle-on={appState.settings.knownKnowledge.enabled}
+            onclick={toggleKnowledge}
+            aria-pressed={appState.settings.knownKnowledge.enabled}
+            aria-label="Bekanntes Wissen"
+          >
+            <span class="toggle-thumb"></span>
+          </button>
+        </div>
+      </section>
+
+      <section class="section">
+        <button class="btn-primary" onclick={triggerRewrite} disabled={triggering}>
+          {triggering ? 'Wird gestartet…' : 'Aktuelle Seite umformulieren'}
+        </button>
+      </section>
+    </div>
+  {/if}
+</div>
+
+<style>
+  :global(body) {
+    margin: 0;
+    background: #1e1e2e;
+    color: #cdd6f4;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  .popup {
+    width: 360px;
+    min-height: 120px;
+  }
+
+  .loading {
+    padding: 32px;
+    text-align: center;
+    color: #6c7086;
+    font-size: 14px;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid #313244;
+  }
+
+  .title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #cdd6f4;
+    letter-spacing: -0.01em;
+  }
+
+  .icon-btn {
+    all: unset;
+    cursor: pointer;
+    font-size: 18px;
+    color: #6c7086;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color 0.15s;
+  }
+
+  .icon-btn:hover {
+    color: #cdd6f4;
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .section {
+    padding: 12px 16px;
+    border-bottom: 1px solid #313244;
+  }
+
+  .section:last-child {
+    border-bottom: none;
+  }
+
+  .label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #6c7086;
+    margin-bottom: 8px;
+  }
+
+  .select {
+    width: 100%;
+    background: #181825;
+    color: #cdd6f4;
+    border: 1px solid #313244;
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    appearance: auto;
+  }
+
+  .select:focus {
+    outline: 2px solid #89b4fa;
+    outline-offset: -2px;
+  }
+
+  /* Dimension sliders */
+  .dim-row {
+    margin-bottom: 10px;
+  }
+
+  .dim-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .dim-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+  }
+
+  .dim-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #cdd6f4;
+  }
+
+  .dim-hints {
+    font-size: 11px;
+    color: #6c7086;
+  }
+
+  .slider {
+    width: 100%;
+    accent-color: #89b4fa;
+    cursor: pointer;
+  }
+
+  /* Template chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip {
+    all: unset;
+    font-family: inherit;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    border: 1px solid #313244;
+    background: #181825;
+    color: #a6adc8;
+    cursor: pointer;
+    transition:
+      background 0.12s,
+      color 0.12s,
+      border-color 0.12s;
+  }
+
+  .chip:hover {
+    background: #313244;
+    color: #cdd6f4;
+  }
+
+  .chip-active {
+    background: #89b4fa;
+    color: #1e1e2e;
+    border-color: #89b4fa;
+    font-weight: 600;
+  }
+
+  /* Toggles */
+  .toggles {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .toggle-label {
+    font-size: 14px;
+    color: #cdd6f4;
+  }
+
+  .toggle {
+    all: unset;
+    position: relative;
+    width: 40px;
+    height: 22px;
+    border-radius: 11px;
+    background: #313244;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle-on {
+    background: #89b4fa;
+  }
+
+  .toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #cdd6f4;
+    transition: transform 0.2s;
+    pointer-events: none;
+  }
+
+  .toggle-on .toggle-thumb {
+    transform: translateX(18px);
+  }
+
+  /* Primary button */
+  .btn-primary {
+    all: unset;
+    font-family: inherit;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    background: #89b4fa;
+    color: #1e1e2e;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: #74c7ec;
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+</style>

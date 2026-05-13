@@ -13,6 +13,13 @@ import {
 export default defineContentScript({
   matches: ['<all_urls>'],
   async main() {
+    browser.runtime.onMessage.addListener((msg: unknown) => {
+      const m = msg as { type: string; payload: { styleId: string } };
+      if (m.type !== 'TRIGGER_REWRITE') return false;
+      runAutoRewrite(m.payload.styleId, segmentRewriter).catch(console.error);
+      return false;
+    });
+
     const article = detectArticle();
     if (!article) return;
 

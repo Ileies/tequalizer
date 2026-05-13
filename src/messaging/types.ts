@@ -23,7 +23,8 @@ export type Message =
   | { type: 'GET_SETTINGS' }
   | { type: 'UPDATE_SETTINGS'; payload: Partial<Settings> }
   | { type: 'SAVE_STYLE'; payload: StyleConfig }
-  | { type: 'DELETE_STYLE'; payload: { id: string } };
+  | { type: 'DELETE_STYLE'; payload: { id: string } }
+  | { type: 'TRIGGER_REWRITE'; payload: { styleId: string } };
 
 export type MessageType = Message['type'];
 
