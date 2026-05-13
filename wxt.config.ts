@@ -6,12 +6,22 @@ export default defineConfig({
   vite: () => ({
     plugins: [tailwindcss()],
   }),
-  // Phase 9: Firefox auf MV3 umstellen (wxt build -b firefox mit manifestVersion: 3)
+  manifestVersion: 3,
   suppressWarnings: { firefoxDataCollection: true },
-  manifest: {
+  manifest: ({ browser }) => ({
     name: 'Rewrite — Texte in deinem Stil',
     description: 'Formuliert Artikel und Blogeinträge in deinen bevorzugten Stil um.',
     permissions: ['storage', 'activeTab', 'scripting'],
     host_permissions: ['<all_urls>', 'https://api.openai.com/*'],
-  },
+    ...(browser === 'firefox'
+      ? {
+          browser_specific_settings: {
+            gecko: {
+              id: 'rewrite@ileies.dev',
+              strict_min_version: '128.0',
+            },
+          },
+        }
+      : {}),
+  }),
 });
