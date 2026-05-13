@@ -1,9 +1,25 @@
 {
-  "extends": ".wxt/tsconfig.json",
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "noEmit": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
-    "skipLibCheck": true
-  }
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "paths": {
+      "@": ["."],
+      "@/*": ["./*"],
+      "~": ["."],
+      "~/*": ["./*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.svelte", ".wxt/wxt.d.ts"],
+  "exclude": [".output", "node_modules", ".wxt"]
 }
