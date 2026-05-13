@@ -1,5 +1,6 @@
 import { segmentDocument, type Segment } from './domSegmenter.ts';
 import { shouldRewrite } from './segmentClassifier.ts';
+import { showOriginals, showRewritten } from './domSurgeon.ts';
 
 const MAX_CONCURRENT = 3;
 
@@ -40,7 +41,13 @@ function byVerticalPosition(a: Segment, b: Segment): number {
   return aTop - bTop;
 }
 
-function createBanner(total: number): { root: HTMLElement; updateText: (done: number) => void } {
+interface BannerElements {
+  root: HTMLElement;
+  updateText: (done: number, total: number) => void;
+  addToggle: (root: Element) => void;
+}
+
+function createBanner(): BannerElements {
   const root = document.createElement('div');
   root.setAttribute('data-rewrite-banner', 'true');
   Object.assign(root.style, {
@@ -56,26 +63,52 @@ function createBanner(total: number): { root: HTMLElement; updateText: (done: nu
     fontSize: '14px',
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: '10px',
     boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
-    maxWidth: '320px',
+    maxWidth: '400px',
   });
 
   const text = document.createElement('span');
-  text.textContent = `0 von ${total} Abschnitten umformuliert`;
+  text.textContent = '0 von … Abschnitten umformuliert';
   root.appendChild(text);
 
-  const updateText = (done: number): void => {
-    text.textContent = `${done} von ${total} Abschnitten umformuliert`;
+  return {
+    root,
+    updateText(done, total) {
+      text.textContent = `${done} von ${total} Abschnitten umformuliert`;
+    },
+    addToggle(docRoot: Element) {
+      let showingOriginal = false;
+      const btn = document.createElement('button');
+      btn.textContent = 'Original';
+      Object.assign(btn.style, {
+        background: '#313244',
+        color: '#cdd6f4',
+        border: 'none',
+        borderRadius: '4px',
+        padding: '4px 10px',
+        cursor: 'pointer',
+        fontSize: '13px',
+        flexShrink: '0',
+      });
+      btn.addEventListener('click', () => {
+        showingOriginal = !showingOriginal;
+        if (showingOriginal) {
+          showOriginals(docRoot);
+          btn.textContent = 'Umformuliert';
+          btn.style.background = '#45475a';
+        } else {
+          showRewritten(docRoot);
+          btn.textContent = 'Original';
+          btn.style.background = '#313244';
+        }
+      });
+      root.appendChild(btn);
+    },
   };
-
-  return { root, updateText };
 }
 
-function addStopButton(
-  banner: HTMLElement,
-  controller: AbortController
-): void {
+function addStopButton(bannerEl: HTMLElement, controller: AbortController): void {
   const btn = document.createElement('button');
   btn.textContent = 'Stop';
   Object.assign(btn.style, {
@@ -90,7 +123,7 @@ function addStopButton(
     flexShrink: '0',
   });
   btn.addEventListener('click', () => controller.abort());
-  banner.appendChild(btn);
+  bannerEl.appendChild(btn);
 }
 
 export async function runAutoRewrite(
@@ -108,9 +141,10 @@ export async function runAutoRewrite(
   }
 
   const controller = new AbortController();
-  const { root: bannerEl, updateText } = createBanner(rewritable.length);
-  addStopButton(bannerEl, controller);
-  document.body.appendChild(bannerEl);
+  const banner = createBanner();
+  addStopButton(banner.root, controller);
+  banner.updateText(0, rewritable.length);
+  document.body.appendChild(banner.root);
 
   let rewritten = 0;
 
@@ -123,15 +157,20 @@ export async function runAutoRewrite(
       try {
         await rewriter(segment, requestId, styleId, controller.signal);
         rewritten++;
-        updateText(rewritten);
+        banner.updateText(rewritten, rewritable.length);
       } catch {
-        // segment skipped on error — continue with others
+        // segment skipped on error — others continue
       }
     },
     controller.signal
   );
 
-  setTimeout(() => bannerEl.remove(), 3000);
+  // Replace Stop button with toggle
+  const stopBtn = banner.root.querySelector('button');
+  stopBtn?.remove();
+  banner.addToggle(root);
+
+  setTimeout(() => banner.root.remove(), 30_000);
 
   return { total: rewritable.length, rewritten, stopped: controller.signal.aborted };
 }
