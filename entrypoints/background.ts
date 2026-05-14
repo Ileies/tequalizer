@@ -1,6 +1,7 @@
 import { getState, setState, updateSettings } from '../src/storage/storageAdapter.ts';
 import { getActiveProvider } from '../src/llm/providerRegistry.ts';
 import { buildPrompt } from '../src/llm/promptBuilder.ts';
+import { buildExtractionPrompt, parseExtractedStyle } from '../src/llm/styleExtractor.ts';
 import { checkFidelity } from '../src/fidelity/checker.ts';
 import type { Message } from '../src/messaging/types.ts';
 
@@ -53,6 +54,32 @@ async function handleMessage(
         ),
       });
       sendResponse(undefined);
+      break;
+    }
+    case 'EXTRACT_STYLE': {
+      try {
+        const state = await getState();
+        const provider = getActiveProvider(state.settings);
+        const { systemPrompt, userPrompt } = buildExtractionPrompt(msg.payload.text);
+        const gen = provider.streamRewrite({
+          text: msg.payload.text,
+          systemPrompt,
+          userPrompt,
+          temperature: 0,
+          maxTokens: 512,
+        });
+        let fullText = '';
+        let step = await gen.next();
+        while (!step.done) {
+          fullText += step.value;
+          step = await gen.next();
+        }
+        const result = parseExtractedStyle(fullText);
+        sendResponse(result ?? { error: 'Style konnte nicht extrahiert werden.' });
+      } catch (err) {
+        const error = err instanceof Error ? err.message : 'Unbekannter Fehler';
+        sendResponse({ error });
+      }
       break;
     }
     default:

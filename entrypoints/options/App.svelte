@@ -199,48 +199,33 @@
   }
 </script>
 
-<div class="page">
+<div class="min-h-screen">
   {#if !appState}
-    <div class="loading">Laden…</div>
+    <div class="p-20 text-center text-[#6c7086] text-sm">Laden…</div>
   {:else}
-    <div class="layout">
-      <nav class="sidebar">
-        <div class="app-name">Tequalizer</div>
-        <button
-          class="nav-item"
-          class:active={activeTab === 'api'}
-          onclick={() => (activeTab = 'api')}
-        >API & Anbieter</button>
-        <button
-          class="nav-item"
-          class:active={activeTab === 'styles'}
-          onclick={() => (activeTab = 'styles')}
-        >Style-Bibliothek</button>
-        <button
-          class="nav-item"
-          class:active={activeTab === 'automode'}
-          onclick={() => (activeTab = 'automode')}
-        >Auto-Modus</button>
-        <button
-          class="nav-item"
-          class:active={activeTab === 'knowledge'}
-          onclick={() => (activeTab = 'knowledge')}
-        >Bekanntes Wissen</button>
+    <div class="flex min-h-screen">
+      <nav class="w-[260px] shrink-0 bg-[#181825] border-r border-[#313244] px-5 py-8 flex flex-col gap-0.5">
+        <div class="text-xl font-bold text-[#cdd6f4] tracking-[-0.01em] px-3 pb-5 border-b border-[#313244] mb-3">Tequalizer</div>
+        {#each ([['api', 'API & Anbieter'], ['styles', 'Style-Bibliothek'], ['automode', 'Auto-Modus'], ['knowledge', 'Bekanntes Wissen']] as const) as [tab, label]}
+          <button
+            class="block w-full text-sm px-3 py-[10px] rounded-lg border-l-[3px] cursor-pointer transition-[background,color] duration-[0.12s] text-left {activeTab === tab ? 'bg-[#89b4fa]/10 text-[#89b4fa] font-semibold border-l-[#89b4fa]' : 'text-[#a6adc8] border-l-transparent hover:bg-[#313244]/70 hover:text-[#cdd6f4]'}"
+            onclick={() => (activeTab = tab)}
+          >{label}</button>
+        {/each}
       </nav>
 
-      <main class="content">
+      <main class="flex-1 px-16 py-[52px] max-w-[820px]">
         <!-- ── API & Anbieter ── -->
         {#if activeTab === 'api'}
-          <h1>API & Anbieter</h1>
-          <p class="page-desc">Verbinde Tequalizer mit deinem bevorzugten KI-Anbieter.</p>
+          <h1 class="block text-[26px] font-bold text-[#cdd6f4] tracking-[-0.02em] mb-1.5">API & Anbieter</h1>
+          <p class="block text-sm text-[#6c7086] mb-8 leading-normal">Verbinde Rewrite mit deinem bevorzugten KI-Anbieter.</p>
 
-          <section class="card">
-            <div class="field-label">Anbieter</div>
-            <div class="provider-tabs">
+          <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
+            <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3">Anbieter</div>
+            <div class="flex gap-2">
               {#each (['openai', 'claude', 'ollama'] as const) as p}
                 <button
-                  class="provider-tab"
-                  class:provider-active={appState.settings.provider === p}
+                  class="text-sm px-[22px] py-[9px] rounded-lg border cursor-pointer transition-[background,color,border-color] duration-[0.12s] {appState.settings.provider === p ? 'bg-[#89b4fa] text-[#1e1e2e] border-[#89b4fa] font-semibold' : 'bg-[#1e1e2e] text-[#a6adc8] border-[#313244] hover:bg-[#313244] hover:text-[#cdd6f4]'}"
                   onclick={() => saveProvider(p)}
                 >
                   {p === 'openai' ? 'OpenAI' : p === 'claude' ? 'Claude' : 'Ollama'}
@@ -250,27 +235,26 @@
           </section>
 
           {#if appState.settings.provider === 'openai'}
-            <section class="card">
-              <div class="field-label">OpenAI API-Key</div>
-              <div class="input-row">
+            <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
+              <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3">OpenAI API-Key</div>
+              <div class="flex gap-2 items-center">
                 <input
-                  class="text-input"
+                  class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-[10px] text-sm focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
                   type={showOpenaiKey ? 'text' : 'password'}
                   placeholder="sk-…"
                   value={appState.settings.apiKeys.openai ?? ''}
                   onchange={(e) => saveOpenaiKey(e.currentTarget.value)}
                 />
-                <button class="icon-btn" onclick={() => (showOpenaiKey = !showOpenaiKey)}>
+                <button class="cursor-pointer text-base px-2 py-1.5 rounded-md shrink-0 leading-none hover:bg-[#313244]" onclick={() => (showOpenaiKey = !showOpenaiKey)}>
                   {showOpenaiKey ? '🙈' : '👁'}
                 </button>
               </div>
 
-              <div class="field-label" style="margin-top: 20px;">Modell</div>
+              <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3 mt-5">Modell</div>
               <select
-                class="select"
+                class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-[10px] text-sm cursor-pointer focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px]"
                 value={appState.settings.openaiModel}
-                onchange={(e) =>
-                  saveOpenaiModel(e.currentTarget.value as Settings['openaiModel'])}
+                onchange={(e) => saveOpenaiModel(e.currentTarget.value as Settings['openaiModel'])}
               >
                 {#each OPENAI_MODELS as m}
                   <option value={m}>{m}</option>
@@ -280,20 +264,20 @@
           {/if}
 
           {#if appState.settings.provider === 'claude'}
-            <section class="card">
-              <div class="field-row">
-                <div class="field-label">Claude API-Key</div>
-                <span class="badge">Experimentell</span>
+            <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
+              <div class="flex items-center gap-[10px] mb-3">
+                <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086]">Claude API-Key</div>
+                <span class="text-[11px] font-semibold px-2 py-[3px] rounded-full bg-[#313244] text-[#a6adc8]">Experimentell</span>
               </div>
-              <div class="input-row">
+              <div class="flex gap-2 items-center">
                 <input
-                  class="text-input"
+                  class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-[10px] text-sm focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
                   type={showClaudeKey ? 'text' : 'password'}
                   placeholder="sk-ant-…"
                   value={appState.settings.apiKeys.claude ?? ''}
                   onchange={(e) => saveClaudeKey(e.currentTarget.value)}
                 />
-                <button class="icon-btn" onclick={() => (showClaudeKey = !showClaudeKey)}>
+                <button class="cursor-pointer text-base px-2 py-1.5 rounded-md shrink-0 leading-none hover:bg-[#313244]" onclick={() => (showClaudeKey = !showClaudeKey)}>
                   {showClaudeKey ? '🙈' : '👁'}
                 </button>
               </div>
@@ -301,20 +285,20 @@
           {/if}
 
           {#if appState.settings.provider === 'ollama'}
-            <section class="card">
-              <div class="field-label">Ollama Endpoint</div>
+            <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
+              <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3">Ollama Endpoint</div>
               <input
-                class="text-input"
+                class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-[10px] text-sm focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
                 type="url"
                 placeholder="http://localhost:11434"
                 value={appState.settings.ollamaEndpoint ?? ''}
                 onchange={(e) => saveOllamaEndpoint(e.currentTarget.value)}
               />
 
-              <div class="field-label" style="margin-top: 20px;">Modell</div>
-              <div class="input-row">
+              <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3 mt-5">Modell</div>
+              <div class="flex gap-2 items-center">
                 <input
-                  class="text-input"
+                  class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-[10px] text-sm focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
                   type="text"
                   placeholder="llama3"
                   value={appState.settings.ollamaModel ?? ''}
@@ -325,40 +309,40 @@
           {/if}
 
           {#if savedMsg}
-            <div class="saved-msg">{savedMsg}</div>
+            <div class="text-[13px] text-[#a6e3a1]">{savedMsg}</div>
           {/if}
         {/if}
 
         <!-- ── Style-Bibliothek ── -->
         {#if activeTab === 'styles'}
-          <div class="tab-header">
-            <h1>Style-Bibliothek</h1>
-            <button class="btn-secondary" onclick={openNewStyle}>+ Neuer Style</button>
+          <div class="flex items-center justify-between mb-8">
+            <h1 class="block text-[26px] font-bold text-[#cdd6f4] tracking-[-0.02em]">Style-Bibliothek</h1>
+            <button class="bg-[#313244] text-[#cdd6f4] text-sm px-[22px] py-[10px] rounded-lg cursor-pointer transition-colors duration-150 hover:bg-[#45475a]" onclick={openNewStyle}>+ Neuer Style</button>
           </div>
 
-          <div class="style-list">
+          <div class="flex flex-col gap-3">
             {#each appState.styleLibrary as style}
-              <div class="style-card">
-                <div class="style-info">
-                  <span class="style-name">{style.name}</span>
-                  <div class="style-badges">
+              <div class="bg-[#181825] border border-[#313244] rounded-xl px-[22px] py-[18px] flex items-center justify-between gap-4">
+                <div class="flex flex-col gap-2 min-w-0">
+                  <span class="text-[15px] font-semibold text-[#cdd6f4]">{style.name}</span>
+                  <div class="flex gap-1.5 flex-wrap">
                     {#if style.builtIn}
-                      <span class="badge">Integriert</span>
+                      <span class="text-[11px] font-semibold px-2 py-[3px] rounded-full bg-[#313244] text-[#a6adc8]">Integriert</span>
                     {/if}
                     {#if style.id === appState.settings.activeStyleId}
-                      <span class="badge badge-active">Standard</span>
+                      <span class="text-[11px] font-semibold px-2 py-[3px] rounded-full bg-[#89b4fa]/15 text-[#89b4fa]">Standard</span>
                     {/if}
                   </div>
                 </div>
-                <div class="style-actions">
+                <div class="flex gap-1 shrink-0">
                   {#if style.id !== appState.settings.activeStyleId}
-                    <button class="btn-ghost" onclick={() => setDefault(style.id)}>
+                    <button class="text-[13px] text-[#89b4fa] px-3 py-1.5 rounded-md cursor-pointer transition-colors duration-[0.12s] hover:bg-[#89b4fa]/10" onclick={() => setDefault(style.id)}>
                       Als Standard
                     </button>
                   {/if}
-                  <button class="btn-ghost" onclick={() => openEditStyle(style)}>Bearbeiten</button>
+                  <button class="text-[13px] text-[#89b4fa] px-3 py-1.5 rounded-md cursor-pointer transition-colors duration-[0.12s] hover:bg-[#89b4fa]/10" onclick={() => openEditStyle(style)}>Bearbeiten</button>
                   {#if !style.builtIn}
-                    <button class="btn-ghost btn-danger" onclick={() => handleDeleteStyle(style.id)}>
+                    <button class="text-[13px] text-[#f38ba8] px-3 py-1.5 rounded-md cursor-pointer transition-colors duration-[0.12s] hover:bg-[#f38ba8]/10" onclick={() => handleDeleteStyle(style.id)}>
                       Löschen
                     </button>
                   {/if}
@@ -370,60 +354,59 @@
 
         <!-- ── Auto-Modus ── -->
         {#if activeTab === 'automode'}
-          <h1>Auto-Modus</h1>
-          <p class="page-desc">Seiten werden automatisch umformuliert, sobald du sie öffnest.</p>
+          <h1 class="block text-[26px] font-bold text-[#cdd6f4] tracking-[-0.02em] mb-1.5">Auto-Modus</h1>
+          <p class="block text-sm text-[#6c7086] mb-8 leading-normal">Seiten werden automatisch umformuliert, sobald du sie öffnest.</p>
 
-          <section class="card">
-            <div class="toggle-row">
+          <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
+            <div class="flex items-center justify-between gap-5 py-0.5">
               <div>
-                <div class="field-label" style="margin-bottom: 2px;">Automatisch umformulieren</div>
-                <div class="field-hint">Texte werden beim Öffnen einer Seite automatisch umgeschrieben.</div>
+                <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-[2px]">Automatisch umformulieren</div>
+                <div class="text-[13px] text-[#6c7086] leading-[1.55]">Texte werden beim Öffnen einer Seite automatisch umgeschrieben.</div>
               </div>
               <button
-                class="toggle"
-                class:toggle-on={appState.settings.autoRewrite.enabled}
+                class="relative w-11 h-6 rounded-xl cursor-pointer transition-colors duration-200 shrink-0 {appState.settings.autoRewrite.enabled ? 'bg-[#89b4fa]' : 'bg-[#313244]'}"
                 onclick={() => saveAutoEnabled(!appState!.settings.autoRewrite.enabled)}
                 aria-pressed={appState.settings.autoRewrite.enabled}
                 aria-label="Auto-Modus aktivieren"
               >
-                <span class="toggle-thumb"></span>
+                <span class="absolute top-1 left-1 w-4 h-4 rounded-full bg-[#cdd6f4] transition-transform duration-200 pointer-events-none {appState.settings.autoRewrite.enabled ? 'translate-x-5' : ''}"></span>
               </button>
             </div>
           </section>
 
-          <section class="card">
-            <div class="field-label">
+          <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
+            <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3">
               Mindest-Wortanzahl: {appState.settings.autoRewrite.minWordCount}
             </div>
-            <div class="field-hint">Abschnitte mit weniger Wörtern werden übersprungen.</div>
+            <div class="text-[13px] text-[#6c7086] mb-[14px] leading-[1.55]">Abschnitte mit weniger Wörtern werden übersprungen.</div>
             <input
               type="range"
-              class="slider"
+              class="w-full accent-[#89b4fa] cursor-pointer mt-2"
               min="10"
               max="500"
               step="10"
               value={appState.settings.autoRewrite.minWordCount}
               onchange={(e) => saveMinWordCount(Number(e.currentTarget.value))}
             />
-            <div class="slider-labels">
+            <div class="flex justify-between text-[11px] text-[#6c7086] mt-1.5">
               <span>10</span>
               <span>500</span>
             </div>
           </section>
 
-          <section class="card">
-            <div class="field-label">Ausgeschlossene Domains</div>
-            <div class="field-hint">Eine Domain pro Zeile, z.B. <code>example.com</code></div>
+          <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
+            <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3">Ausgeschlossene Domains</div>
+            <div class="text-[13px] text-[#6c7086] mb-[14px] leading-[1.55]">Eine Domain pro Zeile, z.B. <code class="font-mono text-xs bg-[#313244] px-[5px] py-0.5 rounded text-[#cba6f7]">example.com</code></div>
             <textarea
-              class="textarea"
+              class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-3 text-sm resize-y leading-[1.6] focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
               rows="6"
               placeholder="example.com&#10;news.example.org"
               bind:value={excludeDomainsText}
             ></textarea>
-            <div class="card-footer">
-              <button class="btn-primary" onclick={saveExcludeDomains}>Speichern</button>
+            <div class="flex items-center gap-3 mt-4">
+              <button class="bg-[#89b4fa] text-[#1e1e2e] text-sm font-semibold px-[22px] py-[10px] rounded-lg cursor-pointer transition-colors duration-150 enabled:hover:bg-[#74c7ec] disabled:opacity-40 disabled:cursor-not-allowed" onclick={saveExcludeDomains}>Speichern</button>
               {#if savedMsg}
-                <span class="saved-msg">{savedMsg}</span>
+                <span class="text-[13px] text-[#a6e3a1]">{savedMsg}</span>
               {/if}
             </div>
           </section>
@@ -431,44 +414,43 @@
 
         <!-- ── Bekanntes Wissen ── -->
         {#if activeTab === 'knowledge'}
-          <h1>Bekanntes Wissen</h1>
-          <p class="page-desc">Dein Profil wird beim Umformulieren als Kontext an das Modell übergeben.</p>
+          <h1 class="block text-[26px] font-bold text-[#cdd6f4] tracking-[-0.02em] mb-1.5">Bekanntes Wissen</h1>
+          <p class="block text-sm text-[#6c7086] mb-8 leading-normal">Dein Profil wird beim Umformulieren als Kontext an das Modell übergeben.</p>
 
-          <section class="card">
-            <div class="toggle-row">
+          <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
+            <div class="flex items-center justify-between gap-5 py-0.5">
               <div>
-                <div class="field-label" style="margin-bottom: 2px;">Bekanntes Wissen verwenden</div>
-                <div class="field-hint">Das Profil wird beim Umformulieren als Kontext übergeben.</div>
+                <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-[2px]">Bekanntes Wissen verwenden</div>
+                <div class="text-[13px] text-[#6c7086] leading-[1.55]">Das Profil wird beim Umformulieren als Kontext übergeben.</div>
               </div>
               <button
-                class="toggle"
-                class:toggle-on={appState.settings.knownKnowledge.enabled}
+                class="relative w-11 h-6 rounded-xl cursor-pointer transition-colors duration-200 shrink-0 {appState.settings.knownKnowledge.enabled ? 'bg-[#89b4fa]' : 'bg-[#313244]'}"
                 onclick={() => saveKnowledgeEnabled(!appState!.settings.knownKnowledge.enabled)}
                 aria-pressed={appState.settings.knownKnowledge.enabled}
                 aria-label="Bekanntes Wissen aktivieren"
               >
-                <span class="toggle-thumb"></span>
+                <span class="absolute top-1 left-1 w-4 h-4 rounded-full bg-[#cdd6f4] transition-transform duration-200 pointer-events-none {appState.settings.knownKnowledge.enabled ? 'translate-x-5' : ''}"></span>
               </button>
             </div>
           </section>
 
-          <section class="card">
-            <div class="field-label">Profil-Text</div>
-            <div class="field-hint">Beschreibe deinen Schreibstil, dein Publikum oder andere Hinweise für das Modell.</div>
+          <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
+            <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3">Profil-Text</div>
+            <div class="text-[13px] text-[#6c7086] mb-[14px] leading-[1.55]">Beschreibe deinen Schreibstil, dein Publikum oder andere Hinweise für das Modell.</div>
             <textarea
-              class="textarea"
+              class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-3 text-sm resize-y leading-[1.6] focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
               rows="10"
               maxlength="2000"
               placeholder="Ich schreibe für ein technisch versiertes Publikum…"
               bind:value={profileText}
             ></textarea>
-            <div class="card-footer">
-              <span class="char-count">{profileText.length} / 2000</span>
-              <button class="btn-primary" onclick={() => saveProfileText(profileText)}>
+            <div class="flex items-center gap-3 mt-4">
+              <span class="text-xs text-[#6c7086] ml-auto">{profileText.length} / 2000</span>
+              <button class="bg-[#89b4fa] text-[#1e1e2e] text-sm font-semibold px-[22px] py-[10px] rounded-lg cursor-pointer transition-colors duration-150 enabled:hover:bg-[#74c7ec] disabled:opacity-40 disabled:cursor-not-allowed" onclick={() => saveProfileText(profileText)}>
                 Speichern
               </button>
               {#if savedMsg}
-                <span class="saved-msg">{savedMsg}</span>
+                <span class="text-[13px] text-[#a6e3a1]">{savedMsg}</span>
               {/if}
             </div>
           </section>
@@ -485,600 +467,69 @@
   oncancel={closeDialog}
   onclick={(e) => { if (e.target === dialog) closeDialog(); }}
 >
-  <div class="dialog-inner" role="presentation" onclick={(e) => e.stopPropagation()}>
+  <div class="bg-[#1e1e2e] text-[#cdd6f4] rounded-[14px] p-9 w-[min(90vw,560px)] max-h-[88vh] overflow-y-auto flex flex-col shadow-[0_12px_48px_rgba(0,0,0,0.65)]" role="presentation" onclick={(e) => e.stopPropagation()}>
     {#if editStyle}
-      <h2>{isNewStyle ? 'Neuer Style' : 'Style bearbeiten'}</h2>
+      <h2 class="block text-lg font-bold text-[#cdd6f4] tracking-[-0.01em] mb-6">{isNewStyle ? 'Neuer Style' : 'Style bearbeiten'}</h2>
 
-      <div class="field-label">Name</div>
+      <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3">Name</div>
       <input
-        class="text-input"
+        class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-[10px] text-sm focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
         type="text"
         placeholder="Mein Style"
         bind:value={editStyle.name}
       />
 
-      <div class="field-label" style="margin-top: 20px;">Dimensionen</div>
+      <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3 mt-5">Dimensionen</div>
       {#each DIMS as dim}
-        <div class="dim-row">
-          <div class="dim-header">
-            <span class="dim-label">{dim.label}</span>
-            <span class="dim-hints">{dim.min} → {dim.max}</span>
+        <div class="mb-4 last:mb-0">
+          <div class="flex justify-between items-baseline mb-1">
+            <span class="text-[13px] font-medium text-[#cdd6f4]">{dim.label}</span>
+            <span class="text-[11px] text-[#6c7086]">{dim.min} → {dim.max}</span>
           </div>
-          <div class="slider-wrap">
+          <div class="relative pb-3">
             <input
               type="range"
               min="-2"
               max="2"
               step="1"
-              class="slider"
+              class="w-full accent-[#89b4fa] cursor-pointer"
               bind:value={editStyle.dimensions[dim.key]}
             />
-            <div class="slider-dots">
+            <div class="flex justify-between px-2 pointer-events-none absolute bottom-0 left-0 right-0">
               {#each [-2, -1, 0, 1, 2] as tick}
-                <span class="dot" class:dot-center={tick === 0}></span>
+                <span class="w-1.5 h-1.5 rounded-full shrink-0 {tick === 0 ? 'bg-[#585b70]' : 'bg-[#45475a]'}"></span>
               {/each}
             </div>
           </div>
         </div>
       {/each}
 
-      <div class="field-label" style="margin-top: 20px;">Eigene Anweisungen <span class="field-hint-inline">(optional, max. 2000 Zeichen)</span></div>
+      <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3 mt-5">
+        Eigene Anweisungen <span class="text-[11px] text-[#6c7086] normal-case tracking-normal font-normal">(optional, max. 2000 Zeichen)</span>
+      </div>
       <textarea
-        class="textarea"
+        class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-3 text-sm resize-y leading-[1.6] focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
         rows="4"
         maxlength="2000"
         placeholder="Verwende kurze Sätze. Schreibe in der Du-Form."
         bind:value={editStyle.customInstructions}
       ></textarea>
 
-      <div class="dialog-actions">
+      <div class="flex gap-[10px] justify-end mt-7">
         <button
-          class="btn-primary"
+          class="bg-[#89b4fa] text-[#1e1e2e] text-sm font-semibold px-[22px] py-[10px] rounded-lg cursor-pointer transition-colors duration-150 enabled:hover:bg-[#74c7ec] disabled:opacity-40 disabled:cursor-not-allowed"
           onclick={submitStyle}
           disabled={!editStyle.name.trim()}
         >
           {isNewStyle ? 'Erstellen' : 'Speichern'}
         </button>
-        <button class="btn-secondary" onclick={closeDialog}>Abbrechen</button>
+        <button class="bg-[#313244] text-[#cdd6f4] text-sm px-[22px] py-[10px] rounded-lg cursor-pointer transition-colors duration-150 hover:bg-[#45475a]" onclick={closeDialog}>Abbrechen</button>
       </div>
     {/if}
   </div>
 </dialog>
 
 <style>
-  :global(body) {
-    margin: 0;
-    background: #1e1e2e;
-    color: #cdd6f4;
-    font-family: system-ui, -apple-system, sans-serif;
-  }
-
-  .page {
-    min-height: 100vh;
-  }
-
-  .loading {
-    padding: 80px;
-    text-align: center;
-    color: #6c7086;
-    font-size: 14px;
-  }
-
-  /* Layout */
-  .layout {
-    display: flex;
-    min-height: 100vh;
-  }
-
-  .sidebar {
-    width: 260px;
-    flex-shrink: 0;
-    background: #181825;
-    border-right: 1px solid #313244;
-    padding: 32px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .app-name {
-    font-size: 20px;
-    font-weight: 700;
-    color: #cdd6f4;
-    letter-spacing: -0.01em;
-    padding: 0 12px 20px;
-    border-bottom: 1px solid #313244;
-    margin-bottom: 12px;
-  }
-
-  .nav-item {
-    all: unset;
-    font-family: inherit;
-    font-size: 14px;
-    color: #a6adc8;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border-left: 3px solid transparent;
-    cursor: pointer;
-    transition: background 0.12s, color 0.12s;
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .nav-item:hover {
-    background: rgba(49, 50, 68, 0.7);
-    color: #cdd6f4;
-  }
-
-  .nav-item.active {
-    background: rgba(137, 180, 250, 0.1);
-    color: #89b4fa;
-    font-weight: 600;
-    border-left-color: #89b4fa;
-  }
-
-  .content {
-    flex: 1;
-    padding: 52px 64px;
-    max-width: 820px;
-  }
-
-  h1 {
-    all: initial;
-    font-family: system-ui, -apple-system, sans-serif;
-    font-size: 26px;
-    font-weight: 700;
-    color: #cdd6f4;
-    letter-spacing: -0.02em;
-    display: block;
-    margin-bottom: 6px;
-  }
-
-  .page-desc {
-    all: initial;
-    font-family: system-ui, -apple-system, sans-serif;
-    font-size: 14px;
-    color: #6c7086;
-    display: block;
-    margin-bottom: 32px;
-    line-height: 1.5;
-  }
-
-  .tab-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 32px;
-  }
-
-  .tab-header h1 {
-    margin-bottom: 0;
-  }
-
-  /* Cards */
-  .card {
-    background: #181825;
-    border: 1px solid #313244;
-    border-radius: 12px;
-    padding: 24px 28px;
-    margin-bottom: 20px;
-  }
-
-  .field-label {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #6c7086;
-    margin-bottom: 12px;
-    display: block;
-  }
-
-  .field-hint {
-    font-size: 13px;
-    color: #6c7086;
-    margin-bottom: 14px;
-    line-height: 1.55;
-  }
-
-  .field-hint-inline {
-    font-size: 11px;
-    color: #6c7086;
-    text-transform: none;
-    letter-spacing: 0;
-    font-weight: 400;
-  }
-
-  .field-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-
-  .field-row .field-label {
-    margin-bottom: 0;
-  }
-
-  /* Provider tabs */
-  .provider-tabs {
-    display: flex;
-    gap: 8px;
-  }
-
-  .provider-tab {
-    all: unset;
-    font-family: inherit;
-    font-size: 14px;
-    padding: 9px 22px;
-    border-radius: 8px;
-    border: 1px solid #313244;
-    background: #1e1e2e;
-    color: #a6adc8;
-    cursor: pointer;
-    transition: background 0.12s, color 0.12s, border-color 0.12s;
-  }
-
-  .provider-tab:hover {
-    background: #313244;
-    color: #cdd6f4;
-  }
-
-  .provider-active {
-    background: #89b4fa;
-    color: #1e1e2e;
-    border-color: #89b4fa;
-    font-weight: 600;
-  }
-
-  /* Inputs */
-  .text-input {
-    width: 100%;
-    box-sizing: border-box;
-    background: #1e1e2e;
-    color: #cdd6f4;
-    border: 1px solid #313244;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 14px;
-    font-family: inherit;
-  }
-
-  .text-input:focus {
-    outline: 2px solid #89b4fa;
-    outline-offset: -2px;
-  }
-
-  .text-input::placeholder {
-    color: #45475a;
-  }
-
-  .input-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .select {
-    width: 100%;
-    background: #1e1e2e;
-    color: #cdd6f4;
-    border: 1px solid #313244;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 14px;
-    font-family: inherit;
-    cursor: pointer;
-    appearance: auto;
-  }
-
-  .select:focus {
-    outline: 2px solid #89b4fa;
-    outline-offset: -2px;
-  }
-
-  .textarea {
-    width: 100%;
-    box-sizing: border-box;
-    background: #1e1e2e;
-    color: #cdd6f4;
-    border: 1px solid #313244;
-    border-radius: 8px;
-    padding: 12px 14px;
-    font-size: 14px;
-    font-family: inherit;
-    resize: vertical;
-    line-height: 1.6;
-  }
-
-  .textarea:focus {
-    outline: 2px solid #89b4fa;
-    outline-offset: -2px;
-  }
-
-  .textarea::placeholder {
-    color: #45475a;
-  }
-
-  code {
-    font-family: monospace;
-    font-size: 12px;
-    background: #313244;
-    padding: 2px 5px;
-    border-radius: 4px;
-    color: #cba6f7;
-  }
-
-  /* Icon button (key visibility) */
-  .icon-btn {
-    all: unset;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 6px 8px;
-    border-radius: 6px;
-    flex-shrink: 0;
-    line-height: 1;
-  }
-
-  .icon-btn:hover {
-    background: #313244;
-  }
-
-  /* Badges */
-  .badge {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 99px;
-    background: #313244;
-    color: #a6adc8;
-    text-transform: none;
-    letter-spacing: 0;
-  }
-
-  .badge-active {
-    background: rgba(137, 180, 250, 0.15);
-    color: #89b4fa;
-  }
-
-  /* Style list */
-  .style-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .style-card {
-    background: #181825;
-    border: 1px solid #313244;
-    border-radius: 12px;
-    padding: 18px 22px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-  }
-
-  .style-info {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-width: 0;
-  }
-
-  .style-name {
-    font-size: 15px;
-    font-weight: 600;
-    color: #cdd6f4;
-  }
-
-  .style-badges {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .style-actions {
-    display: flex;
-    gap: 4px;
-    flex-shrink: 0;
-  }
-
-  /* Buttons */
-  .btn-primary {
-    all: unset;
-    font-family: inherit;
-    background: #89b4fa;
-    color: #1e1e2e;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 10px 22px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  .btn-primary:hover:not(:disabled) {
-    background: #74c7ec;
-  }
-
-  .btn-primary:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  .btn-secondary {
-    all: unset;
-    font-family: inherit;
-    background: #313244;
-    color: #cdd6f4;
-    font-size: 14px;
-    padding: 10px 22px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  .btn-secondary:hover {
-    background: #45475a;
-  }
-
-  .btn-ghost {
-    all: unset;
-    font-family: inherit;
-    font-size: 13px;
-    color: #89b4fa;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.12s;
-  }
-
-  .btn-ghost:hover {
-    background: rgba(137, 180, 250, 0.1);
-  }
-
-  .btn-danger {
-    color: #f38ba8;
-  }
-
-  .btn-danger:hover {
-    background: rgba(243, 139, 168, 0.1);
-  }
-
-  /* Card footer */
-  .card-footer {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 16px;
-  }
-
-  .saved-msg {
-    font-size: 13px;
-    color: #a6e3a1;
-  }
-
-  .char-count {
-    font-size: 12px;
-    color: #6c7086;
-    margin-left: auto;
-  }
-
-  /* Slider */
-  .slider {
-    width: 100%;
-    accent-color: #89b4fa;
-    cursor: pointer;
-    margin-top: 8px;
-  }
-
-  .slider-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: #6c7086;
-    margin-top: 6px;
-  }
-
-  /* Toggle */
-  .toggle-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 2px 0;
-  }
-
-  .toggle {
-    all: unset;
-    position: relative;
-    width: 44px;
-    height: 24px;
-    border-radius: 12px;
-    background: #313244;
-    cursor: pointer;
-    transition: background 0.2s;
-    flex-shrink: 0;
-  }
-
-  .toggle-on {
-    background: #89b4fa;
-  }
-
-  .toggle-thumb {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #cdd6f4;
-    transition: transform 0.2s;
-    pointer-events: none;
-  }
-
-  .toggle-on .toggle-thumb {
-    transform: translateX(20px);
-  }
-
-  /* Dim sliders */
-  .dim-row {
-    margin-bottom: 16px;
-  }
-
-  .dim-row:last-child {
-    margin-bottom: 0;
-  }
-
-  .dim-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 4px;
-  }
-
-  .dim-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #cdd6f4;
-  }
-
-  .dim-hints {
-    font-size: 11px;
-    color: #6c7086;
-  }
-
-  .slider-wrap {
-    position: relative;
-    padding-bottom: 12px;
-  }
-
-  .slider-dots {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 8px;
-    pointer-events: none;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-
-  .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #45475a;
-    flex-shrink: 0;
-  }
-
-  .dot-center {
-    background: #585b70;
-  }
-
-  /* Dialog */
   dialog {
     all: initial;
     display: none;
@@ -1094,57 +545,13 @@
     height: 100vh;
     overflow: hidden;
   }
-
   dialog[open] {
     display: flex;
     align-items: center;
     justify-content: center;
   }
-
   dialog::backdrop {
     background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(3px);
-  }
-
-  .dialog-inner {
-    background: #1e1e2e;
-    color: #cdd6f4;
-    border-radius: 14px;
-    padding: 36px;
-    width: min(90vw, 560px);
-    max-height: 88vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    font-family: system-ui, -apple-system, sans-serif;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.65);
-  }
-
-  h2 {
-    all: initial;
-    font-family: system-ui, -apple-system, sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: #cdd6f4;
-    letter-spacing: -0.01em;
-    display: block;
-    margin-bottom: 24px;
-  }
-
-  .dialog-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 28px;
-  }
-
-  .dialog-inner .text-input,
-  .dialog-inner .textarea {
-    margin-bottom: 0;
-  }
-
-  .dialog-inner .field-label {
-    margin-top: 0;
   }
 </style>

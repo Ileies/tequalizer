@@ -1,4 +1,5 @@
 import type { Settings, StyleConfig } from '../storage/schema.ts';
+import type { ExtractedStyle } from '../llm/styleExtractor.ts';
 
 export interface FidelityIssue {
   severity: 'high' | 'medium' | 'low';
@@ -24,7 +25,9 @@ export type Message =
   | { type: 'UPDATE_SETTINGS'; payload: Partial<Settings> }
   | { type: 'SAVE_STYLE'; payload: StyleConfig }
   | { type: 'DELETE_STYLE'; payload: { id: string } }
-  | { type: 'TRIGGER_REWRITE'; payload: { styleId: string } };
+  | { type: 'TRIGGER_REWRITE'; payload: { styleId: string } }
+  | { type: 'GET_PAGE_SAMPLES' }
+  | { type: 'EXTRACT_STYLE'; payload: { text: string } };
 
 export type MessageType = Message['type'];
 
@@ -36,4 +39,8 @@ export type ResponseFor<T extends Message> = T extends { type: 'GET_SETTINGS' }
       ? void
       : T extends { type: 'DELETE_STYLE' }
         ? void
-        : void;
+        : T extends { type: 'GET_PAGE_SAMPLES' }
+          ? { text: string } | null
+          : T extends { type: 'EXTRACT_STYLE' }
+            ? ExtractedStyle | { error: string }
+            : void;

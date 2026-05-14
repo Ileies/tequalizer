@@ -13,12 +13,22 @@ import {
 export default defineContentScript({
   matches: ['<all_urls>'],
   async main() {
-    browser.runtime.onMessage.addListener((msg: unknown) => {
-      const m = msg as { type: string; payload: { styleId: string } };
-      if (m.type !== 'TRIGGER_REWRITE') return false;
-      runAutoRewrite(m.payload.styleId, segmentRewriter).catch(console.error);
-      return false;
-    });
+    browser.runtime.onMessage.addListener(
+      (msg: unknown, _sender, sendResponse: (r: unknown) => void) => {
+        const m = msg as { type: string; payload?: unknown };
+        if (m.type === 'TRIGGER_REWRITE') {
+          const { styleId } = m.payload as { styleId: string };
+          runAutoRewrite(styleId, segmentRewriter).catch(console.error);
+          return false;
+        }
+        if (m.type === 'GET_PAGE_SAMPLES') {
+          const text = collectPageText();
+          sendResponse(text ? { text } : null);
+          return true;
+        }
+        return false;
+      }
+    );
 
     const article = detectArticle();
     if (!article) return;
@@ -32,6 +42,18 @@ export default defineContentScript({
     await runAutoRewrite(settings.activeStyleId, segmentRewriter);
   },
 });
+
+function collectPageText(): string {
+  const article = detectArticle();
+  if (article) return article.textContent.trim().slice(0, 3000);
+  const texts: string[] = [];
+  for (const el of document.querySelectorAll('p, h1, h2, h3')) {
+    const text = el.textContent?.trim() ?? '';
+    if (text.length > 40) texts.push(text);
+    if (texts.join('\n\n').length > 3000) break;
+  }
+  return texts.join('\n\n').slice(0, 3000);
+}
 
 async function segmentRewriter(
   segment: Segment,
