@@ -29,7 +29,7 @@ export function buildPrompt(
     const tmpl = TEMPLATES[style.template];
     if (tmpl) {
       parts.push('');
-      parts.push(`Schreibstil-Vorbild: ${tmpl.description}`);
+      parts.push(tmpl.systemPrompt);
       if (tmpl.fewShot.length > 0) {
         parts.push('Hier Beispiele, wie Original-Sätze in diesem Stil aussehen:');
         for (const pair of tmpl.fewShot) {

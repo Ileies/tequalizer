@@ -2,16 +2,16 @@
   import { getState, updateSettings } from '../../src/storage/storageAdapter.ts';
   import { saveStyle, deleteStyle, createStyle } from '../../src/style-engine/library.ts';
   import type { StoredState, StyleConfig, Settings } from '../../src/storage/schema.ts';
+  import { TEMPLATES as TEMPLATE_DATA } from '../../src/style-engine/presets.ts';
 
   type Tab = 'api' | 'styles' | 'automode' | 'knowledge';
 
   const TEMPLATES: Array<{ id: StyleConfig['template']; label: string }> = [
     { id: 'none', label: 'Keins' },
-    { id: 'ted_talk', label: 'TED Talk' },
-    { id: 'bible', label: 'Bibel' },
-    { id: 'personal_letter', label: 'Brief' },
-    { id: 'academic', label: 'Akademisch' },
-    { id: 'tabloid', label: 'Boulevard' },
+    ...Object.entries(TEMPLATE_DATA).map(([id, t]) => ({
+      id: id as StyleConfig['template'],
+      label: t.label,
+    })),
   ];
 
   const DIMS: Array<{
@@ -535,7 +535,12 @@
           <button
             class="chip"
             class:chip-active={editStyle.template === t.id}
-            onclick={() => { if (editStyle) editStyle.template = t.id; }}
+            onclick={() => {
+              if (!editStyle) return;
+              editStyle.template = t.id;
+              const tmpl = t.id !== 'none' ? TEMPLATE_DATA[t.id] : null;
+              if (tmpl) editStyle.dimensions = { ...tmpl.defaultDimensions };
+            }}
           >
             {t.label}
           </button>

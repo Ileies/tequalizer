@@ -2,14 +2,14 @@
   import { getState, updateSettings } from '../../src/storage/storageAdapter.ts';
   import { saveStyle } from '../../src/style-engine/library.ts';
   import type { StoredState, StyleConfig } from '../../src/storage/schema.ts';
+  import { TEMPLATES as TEMPLATE_DATA } from '../../src/style-engine/presets.ts';
 
   const TEMPLATES: Array<{ id: StyleConfig['template']; label: string }> = [
     { id: 'none', label: 'Keins' },
-    { id: 'ted_talk', label: 'TED Talk' },
-    { id: 'bible', label: 'Bibel' },
-    { id: 'personal_letter', label: 'Brief' },
-    { id: 'academic', label: 'Akademisch' },
-    { id: 'tabloid', label: 'Boulevard' },
+    ...Object.entries(TEMPLATE_DATA).map(([id, t]) => ({
+      id: id as StyleConfig['template'],
+      label: t.label,
+    })),
   ];
 
   const DIMS: Array<{
@@ -57,7 +57,12 @@
 
   async function onTemplateClick(template: StyleConfig['template']) {
     if (!appState || !activeStyle) return;
-    const updated: StyleConfig = { ...activeStyle, template };
+    const tmpl = template !== 'none' ? TEMPLATE_DATA[template] : null;
+    const updated: StyleConfig = {
+      ...activeStyle,
+      template,
+      dimensions: tmpl ? { ...tmpl.defaultDimensions } : activeStyle.dimensions,
+    };
     await saveStyle(updated);
     appState = await getState();
   }

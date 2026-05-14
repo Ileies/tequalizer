@@ -44,7 +44,7 @@ describe('buildPrompt', () => {
   it('ted_talk template includes few-shot examples', () => {
     const style: StyleConfig = { ...DEFAULT_STYLE, template: 'ted_talk' };
     const { systemPrompt } = buildPrompt(TEXT, style, BASE_SETTINGS);
-    expect(systemPrompt).toContain('TED-Talk');
+    expect(systemPrompt).toContain('TED Talk');
     expect(systemPrompt).toContain('Original:');
     expect(systemPrompt).toContain('Umformuliert:');
   });

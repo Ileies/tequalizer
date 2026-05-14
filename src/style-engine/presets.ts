@@ -3,15 +3,29 @@ export interface FewShotPair {
   rewritten: string;
 }
 
+export interface TemplateDimensions {
+  length: number;
+  imagery: number;
+  warmth: number;
+  formality: number;
+}
+
 export interface Template {
+  label: string;
   description: string;
+  systemPrompt: string;
+  defaultDimensions: TemplateDimensions;
   fewShot: FewShotPair[];
 }
 
 export const TEMPLATES: Record<string, Template> = {
   ted_talk: {
+    label: 'TED Talk',
     description:
       'TED-Talk-Stil: persönlicher Einstieg, eine starke These, konkrete Geschichten als Belege, Cliffhanger.',
+    systemPrompt:
+      'Schreibe im Stil eines TED Talks: Beginne mit einer persönlichen Anekdote oder einem überraschenden Fakt. Formuliere eine klare zentrale These. Stütze Argumente auf konkrete, lebendige Geschichten statt auf abstrakte Fakten. Erzeuge Spannung durch Cliffhanger und direkte Publikumsansprache.',
+    defaultDimensions: { length: 0.3, imagery: 0.5, warmth: 0.6, formality: -0.3 },
     fewShot: [
       {
         original: 'Studien zeigen, dass Schlafmangel die kognitive Leistung beeinträchtigt.',
@@ -26,8 +40,12 @@ export const TEMPLATES: Record<string, Template> = {
     ],
   },
   bible: {
+    label: 'Bibel',
     description:
       'Bibel-Stil (Lutherbibel-Anmutung): parataktische Reihung mit "und", archaische Wendungen, sentenzenhaft.',
+    systemPrompt:
+      'Schreibe im Stil der Lutherbibel: Reihe Sätze parataktisch mit "Und" aneinander. Verwende archaische Wendungen wie "es geschah", "und er sprach", "in allen Landen". Formuliere sentenzenhaft und feierlich. Vermeide moderne Kolloquialismen.',
+    defaultDimensions: { length: 0.2, imagery: 0.3, warmth: 0.0, formality: 0.7 },
     fewShot: [
       {
         original: 'Das Unternehmen wuchs und wurde erfolgreich.',
@@ -37,8 +55,12 @@ export const TEMPLATES: Record<string, Template> = {
     ],
   },
   personal_letter: {
+    label: 'Brief',
     description:
       'Persönlicher Brief: direkt, herzlich, erzählerisch, als würde man einem guten Freund schreiben.',
+    systemPrompt:
+      'Schreibe wie in einem persönlichen Brief an einen guten Freund: Sprich den Leser direkt mit "du" an. Schildere Sachverhalte erzählerisch und aus eigener Perspektive. Zeige echte Emotion und Nähe. Kurze, natürliche Sätze. Kein Fachjargon.',
+    defaultDimensions: { length: 0.2, imagery: 0.2, warmth: 0.8, formality: -0.5 },
     fewShot: [
       {
         original: 'Die Inflationsrate stieg im vergangenen Quartal auf 4,2 Prozent.',
@@ -48,8 +70,12 @@ export const TEMPLATES: Record<string, Template> = {
     ],
   },
   academic: {
+    label: 'Akademisch',
     description:
       'Akademisch: Fachterminologie, passive Konstruktionen, distanzierter Stil, Quellenverweise impliziert.',
+    systemPrompt:
+      'Schreibe im akademischen Stil: Nutze Fachterminologie und Nominalisierungen. Bevorzuge Passivsätze und distanzierte Formulierungen ("es zeigt sich", "es lässt sich konstatieren"). Vermeide Ich-Perspektive und emotionale Wertungen. Impliziere Quellenangaben durch Formulierungen wie "Studien belegen" oder "empirische Befunde legen nahe".',
+    defaultDimensions: { length: 0.2, imagery: -0.5, warmth: -0.5, formality: 0.9 },
     fewShot: [
       {
         original: 'Zu wenig Schlaf macht dich dumm.',
@@ -59,8 +85,12 @@ export const TEMPLATES: Record<string, Template> = {
     ],
   },
   tabloid: {
+    label: 'Boulevard',
     description:
       'Boulevardstil: Ausrufezeichen, Dramatik, Übertreibungen, emotionale Sprache, kurze Sätze.',
+    systemPrompt:
+      'Schreibe im Boulevardstil: Kurze, knallige Sätze. Großbuchstaben für Schlüsselwörter. Ausrufezeichen. Dramatisierende Adjektive und Übertreibungen. Emotionale, alarmierende Sprache. Suggestive Fragen. Nichts ist gewöhnlich — alles ist sensationell oder bedrohlich.',
+    defaultDimensions: { length: -0.2, imagery: 0.4, warmth: 0.3, formality: -0.7 },
     fewShot: [
       {
         original: 'Die Temperaturen sollen in dieser Woche etwas über dem Durchschnitt liegen.',
