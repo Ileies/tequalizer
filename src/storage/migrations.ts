@@ -46,12 +46,30 @@ const MIGRATIONS: Record<number, Migration> = {
       }),
     };
   },
+  5: (state) => {
+    const library = Array.isArray(state['styleLibrary']) ? state['styleLibrary'] : [];
+    const presetInstructions = new Map(
+      PRESET_STYLES.filter((p) => p.customInstructions).map((p) => [p.id, p.customInstructions!])
+    );
+    return {
+      ...state,
+      styleLibrary: library.map((style: unknown) => {
+        if (typeof style !== 'object' || style === null) return style;
+        const s = style as Record<string, unknown>;
+        const instructions = presetInstructions.get(s['id'] as string);
+        if (instructions && !s['customInstructions']) {
+          return { ...s, customInstructions: instructions };
+        }
+        return s;
+      }),
+    };
+  },
 };
 
 export function migrate(raw: Record<string, unknown>): Record<string, unknown> {
   let state = raw;
   const current = typeof state['schemaVersion'] === 'number' ? state['schemaVersion'] : 0;
-  const target = 4;
+  const target = 5;
 
   for (let v = current + 1; v <= target; v++) {
     const migration = MIGRATIONS[v];
@@ -62,4 +80,4 @@ export function migrate(raw: Record<string, unknown>): Record<string, unknown> {
   return state;
 }
 
-export const CURRENT_SCHEMA_VERSION: StoredState['schemaVersion'] = 4;
+export const CURRENT_SCHEMA_VERSION: StoredState['schemaVersion'] = 5;

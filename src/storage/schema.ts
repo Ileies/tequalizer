@@ -59,11 +59,41 @@ export const DEFAULT_STYLE: StyleConfig = {
 };
 
 export const PRESET_STYLES: StyleConfig[] = [
-  { id: '00000000-0000-0000-0000-000000000002', name: 'TED Talk', builtIn: true, dimensions: { length: 1, imagery: 1, warmth: 1, formality: -1, simplicity: 1 } },
-  { id: '00000000-0000-0000-0000-000000000003', name: 'Bibel', builtIn: true, dimensions: { length: 0, imagery: 1, warmth: 0, formality: 1, simplicity: 0 } },
-  { id: '00000000-0000-0000-0000-000000000004', name: 'Brief', builtIn: true, dimensions: { length: 0, imagery: 0, warmth: 2, formality: -1, simplicity: 1 } },
-  { id: '00000000-0000-0000-0000-000000000005', name: 'Akademisch', builtIn: true, dimensions: { length: 0, imagery: -1, warmth: -1, formality: 2, simplicity: -1 } },
-  { id: '00000000-0000-0000-0000-000000000006', name: 'Boulevard', builtIn: true, dimensions: { length: -1, imagery: 1, warmth: 1, formality: -1, simplicity: 2 } },
+  {
+    id: '00000000-0000-0000-0000-000000000002',
+    name: 'TED Talk',
+    builtIn: true,
+    dimensions: { length: 1, imagery: 1, warmth: 1, formality: -1, simplicity: 1 },
+    customInstructions: 'Fessle vom ersten Satz mit einer persönlichen Anekdote oder überraschenden Frage. Baue eine emotionale Reise auf: Spannung, Wendepunkt, Auflösung. Schließe mit einem klaren Appell oder einer unvergesslichen Botschaft.',
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000003',
+    name: 'Bibel',
+    builtIn: true,
+    dimensions: { length: 0, imagery: 1, warmth: 0, formality: 1, simplicity: 0 },
+    customInstructions: 'Nutze rhythmische Parallelstrukturen und bedeutungsvolle Wiederholungen. Formuliere in überzeitlichen, universellen Begriffen. Lass kurze, kraftvolle Aussagesätze mit feierlichen längeren Perioden wechseln.',
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000004',
+    name: 'Brief',
+    builtIn: true,
+    dimensions: { length: 0, imagery: 0, warmth: 2, formality: -1, simplicity: 1 },
+    customInstructions: 'Schreibe wie an einen guten Freund oder Vertrauten. Teile Gedanken wie in einem echten Gespräch mit. Auch bei ernsten Themen bleibt der Ton leicht und herzlich.',
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000005',
+    name: 'Akademisch',
+    builtIn: true,
+    dimensions: { length: 0, imagery: -1, warmth: -1, formality: 2, simplicity: -1 },
+    customInstructions: 'Formuliere objektiv und distanziert. Gliedere Argumente klar und nachvollziehbar. Meide Umgangssprache, subjektive Wertungen und rhetorische Fragen ohne analytische Funktion.',
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000006',
+    name: 'Boulevard',
+    builtIn: true,
+    dimensions: { length: -1, imagery: 1, warmth: 1, formality: -1, simplicity: 2 },
+    customInstructions: 'Kurze Knallsätze. Dramatisiere und setze auf Überraschungsmomente. Nutze direkte Rede und aktive, starke Verben. Jeder Absatz muss weiterziehen. Ausrufe erlaubt!',
+  },
 ];
 
 export const INITIAL_STATE: StoredState = {
@@ -76,5 +106,5 @@ export const INITIAL_STATE: StoredState = {
     knownKnowledge: { enabled: false, profileText: '' },
   },
   styleLibrary: [DEFAULT_STYLE, ...PRESET_STYLES],
-  schemaVersion: 4,
+  schemaVersion: 5,
 };
