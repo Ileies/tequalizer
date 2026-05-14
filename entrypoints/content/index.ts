@@ -7,7 +7,6 @@ import {
   finalizeStreaming,
   addHoverPreview,
   restoreOriginal,
-  getOriginal,
 } from './domSurgeon.ts';
 
 export default defineContentScript({
@@ -76,8 +75,12 @@ async function segmentRewriter(
     port.onMessage.addListener((msg: { type: string; payload: Record<string, string> }) => {
       if (signal.aborted) {
         port.disconnect();
-        const orig = getOriginal(segment.element);
-        if (orig !== undefined) segment.element.textContent = orig;
+        if (fullText) {
+          finalizeStreaming(segment.element, fullText);
+          addHoverPreview(segment.element);
+        } else {
+          restoreOriginal(segment.element);
+        }
         resolve();
         return;
       }
@@ -109,8 +112,12 @@ async function segmentRewriter(
 
     signal.addEventListener('abort', () => {
       port.disconnect();
-      const orig = getOriginal(segment.element);
-      if (orig !== undefined) segment.element.textContent = orig;
+      if (fullText) {
+        finalizeStreaming(segment.element, fullText);
+        addHoverPreview(segment.element);
+      } else {
+        restoreOriginal(segment.element);
+      }
       resolve();
     });
   });
