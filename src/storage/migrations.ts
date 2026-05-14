@@ -1,5 +1,5 @@
 import type { StoredState } from './schema.ts';
-import { PRESET_STYLES } from './schema.ts';
+import { PRESET_STYLES, DEFAULT_STYLE, DEFAULT_STYLE_ID } from './schema.ts';
 
 type Migration = (state: Record<string, unknown>) => Record<string, unknown>;
 
@@ -64,12 +64,26 @@ const MIGRATIONS: Record<number, Migration> = {
       }),
     };
   },
+  6: (state) => {
+    const library = Array.isArray(state['styleLibrary']) ? state['styleLibrary'] : [];
+    return {
+      ...state,
+      styleLibrary: library.map((style: unknown) => {
+        if (typeof style !== 'object' || style === null) return style;
+        const s = style as Record<string, unknown>;
+        if (s['id'] === DEFAULT_STYLE_ID && !s['customInstructions']) {
+          return { ...s, customInstructions: DEFAULT_STYLE.customInstructions };
+        }
+        return s;
+      }),
+    };
+  },
 };
 
 export function migrate(raw: Record<string, unknown>): Record<string, unknown> {
   let state = raw;
   const current = typeof state['schemaVersion'] === 'number' ? state['schemaVersion'] : 0;
-  const target = 5;
+  const target = 6;
 
   for (let v = current + 1; v <= target; v++) {
     const migration = MIGRATIONS[v];
@@ -80,4 +94,4 @@ export function migrate(raw: Record<string, unknown>): Record<string, unknown> {
   return state;
 }
 
-export const CURRENT_SCHEMA_VERSION: StoredState['schemaVersion'] = 5;
+export const CURRENT_SCHEMA_VERSION: StoredState['schemaVersion'] = 6;

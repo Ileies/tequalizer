@@ -56,6 +56,8 @@ export const DEFAULT_STYLE: StyleConfig = {
   name: 'Neutral',
   builtIn: true,
   dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0, simplicity: 0 },
+  customInstructions:
+    'Schreibe unabhängig vom Stil des Eingabetexts in einem einheitlichen, klaren Standarddeutsch. Keine stilistischen Eigenheiten, keinen Jargon und keine Ausschmückungen des Originals übernehmen.',
 };
 
 export const PRESET_STYLES: StyleConfig[] = [
@@ -64,7 +66,7 @@ export const PRESET_STYLES: StyleConfig[] = [
     name: 'TED Talk',
     builtIn: true,
     dimensions: { length: 1, imagery: 1, warmth: 1, formality: -1, simplicity: 1 },
-    customInstructions: 'Fessle vom ersten Satz mit einer persönlichen Anekdote oder überraschenden Frage. Baue eine emotionale Reise auf: Spannung, Wendepunkt, Auflösung. Schließe mit einem klaren Appell oder einer unvergesslichen Botschaft.',
+    customInstructions: 'Fessle vom ersten Satz mit einer persönlichen Anekdote oder überraschenden Frage. Sprich den Leser direkt an. Baue eine emotionale Reise auf: Spannung, Wendepunkt, Auflösung. Schließe mit einem klaren Appell oder einer unvergesslichen Botschaft.',
   },
   {
     id: '00000000-0000-0000-0000-000000000003',
@@ -78,7 +80,7 @@ export const PRESET_STYLES: StyleConfig[] = [
     name: 'Brief',
     builtIn: true,
     dimensions: { length: 0, imagery: 0, warmth: 2, formality: -1, simplicity: 1 },
-    customInstructions: 'Schreibe wie an einen guten Freund oder Vertrauten. Teile Gedanken wie in einem echten Gespräch mit. Auch bei ernsten Themen bleibt der Ton leicht und herzlich.',
+    customInstructions: 'Schreibe wie an einen guten Freund oder Vertrauten. Nutze direkte, warme Ansprache. Teile Gedanken wie in einem echten Gespräch mit. Auch bei ernsten Themen bleibt der Ton leicht und herzlich.',
   },
   {
     id: '00000000-0000-0000-0000-000000000005',
@@ -106,5 +108,5 @@ export const INITIAL_STATE: StoredState = {
     knownKnowledge: { enabled: false, profileText: '' },
   },
   styleLibrary: [DEFAULT_STYLE, ...PRESET_STYLES],
-  schemaVersion: 5,
+  schemaVersion: 6,
 };

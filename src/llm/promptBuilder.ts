@@ -24,6 +24,7 @@ export function buildPrompt(
   parts.push(dimensionToFragment('imagery', style.dimensions.imagery));
   parts.push(dimensionToFragment('warmth', style.dimensions.warmth));
   parts.push(dimensionToFragment('formality', style.dimensions.formality));
+  parts.push(dimensionToFragment('simplicity', style.dimensions.simplicity));
 
   if (style.customInstructions) {
     parts.push('');
