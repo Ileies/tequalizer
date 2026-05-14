@@ -170,7 +170,5 @@ export async function runAutoRewrite(
   stopBtn?.remove();
   banner.addToggle(root);
 
-  setTimeout(() => banner.root.remove(), 30_000);
-
   return { total: rewritable.length, rewritten, stopped: controller.signal.aborted };
 }
