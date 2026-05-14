@@ -34,7 +34,7 @@ export const Settings = z.object({
   activeStyleId: z.string().uuid(),
   autoRewrite: z.object({
     enabled: z.boolean().default(false),
-    minWordCount: z.number().default(50),
+    minWordCount: z.number().min(0).default(50),
     excludeDomains: z.array(z.string()).default([]),
   }),
   knownKnowledge: z.object({

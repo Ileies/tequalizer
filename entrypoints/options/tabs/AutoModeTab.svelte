@@ -64,23 +64,25 @@
 </section>
 
 <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
-  <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3">
-    Mindest-Wortanzahl: {appState.settings.autoRewrite.minWordCount}
+  <div class="flex items-center gap-3 mb-3">
+    <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086]">Mindest-Wortanzahl</div>
+    {#if appState.settings.autoRewrite.minWordCount === 0}
+      <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#89b4fa]/15 text-[#89b4fa] border border-[#89b4fa]/30">Alle Abschnitte umschreiben</span>
+    {/if}
   </div>
-  <div class="text-[13px] text-[#6c7086] mb-[14px] leading-[1.55]">Abschnitte mit weniger Wörtern werden übersprungen.</div>
+  <div class="text-[13px] text-[#6c7086] mb-[14px] leading-[1.55]">Abschnitte mit weniger Wörtern werden übersprungen. Bei 0 werden alle Abschnitte umgeschrieben.</div>
   <input
-    type="range"
-    class="w-full accent-[#89b4fa] cursor-pointer mt-2"
-    min="10"
-    max="500"
-    step="10"
+    type="number"
+    class="w-32 bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-3 py-2 text-sm focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+    min="0"
+    step="1"
     value={appState.settings.autoRewrite.minWordCount}
-    onchange={(e) => saveMinWordCount(Number(e.currentTarget.value))}
+    onchange={(e) => {
+      const val = Math.max(0, Number(e.currentTarget.value));
+      e.currentTarget.value = String(val);
+      saveMinWordCount(val);
+    }}
   />
-  <div class="flex justify-between text-[11px] text-[#6c7086] mt-1.5">
-    <span>10</span>
-    <span>500</span>
-  </div>
 </section>
 
 <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
