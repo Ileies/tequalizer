@@ -27,6 +27,7 @@ export type Message =
   | { type: 'DELETE_STYLE'; payload: { id: string } }
   | { type: 'TRIGGER_REWRITE'; payload: { styleId: string } }
   | { type: 'GET_PAGE_SAMPLES' }
+  | { type: 'GET_SEGMENT_COUNT' }
   | { type: 'EXTRACT_STYLE'; payload: { text: string } };
 
 export type MessageType = Message['type'];
@@ -41,6 +42,8 @@ export type ResponseFor<T extends Message> = T extends { type: 'GET_SETTINGS' }
         ? void
         : T extends { type: 'GET_PAGE_SAMPLES' }
           ? { text: string } | null
-          : T extends { type: 'EXTRACT_STYLE' }
+          : T extends { type: 'GET_SEGMENT_COUNT' }
+            ? { count: number }
+            : T extends { type: 'EXTRACT_STYLE' }
             ? ExtractedStyle | { error: string }
             : void;

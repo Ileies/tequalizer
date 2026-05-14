@@ -11,6 +11,7 @@
   let pendingDimensions = $state<StyleConfig['dimensions'] | null>(null);
   let triggering = $state(false);
   let extracting = $state(false);
+  let segmentCount = $state<number | null>(null);
   let extractResult = $state<ExtractedStyle | null>(null);
   let extractError = $state<string | null>(null);
   let keyInput = $state('');
@@ -87,6 +88,16 @@
       appState = s;
       await loadPending(s.settings.activeStyleId);
       await loadExtractResult();
+    });
+    browser.tabs.query({ active: true, currentWindow: true }).then(async (tabs) => {
+      const tabId = tabs[0]?.id;
+      if (tabId == null) return;
+      try {
+        const result = (await browser.tabs.sendMessage(tabId, { type: 'GET_SEGMENT_COUNT' })) as { count: number } | null;
+        if (result) segmentCount = result.count;
+      } catch {
+        // Content script not injected on this page
+      }
     });
   });
 
@@ -408,7 +419,7 @@
           onclick={triggerRewrite}
           disabled={triggering}
         >
-          {triggering ? 'Wird gestartet…' : 'Aktuelle Seite umformulieren'}
+          {triggering ? 'Wird gestartet…' : segmentCount !== null ? `Seite umformulieren (${segmentCount} Absätze)` : 'Seite umformulieren'}
         </button>
         <button
           class="btn w-full bg-base-300 hover:bg-neutral text-base-content border-0"

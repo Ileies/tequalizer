@@ -1,7 +1,8 @@
 import { detectArticle } from './articleDetector.ts';
 import { runAutoRewrite } from './autoRewriteOrchestrator.ts';
 import { sendMessage } from '../../src/messaging/client.ts';
-import type { Segment } from './domSegmenter.ts';
+import { segmentDocument, type Segment } from './domSegmenter.ts';
+import { shouldRewrite } from './segmentClassifier.ts';
 import {
   createStreamingNode,
   finalizeStreaming,
@@ -24,6 +25,11 @@ export default defineContentScript({
         if (m.type === 'GET_PAGE_SAMPLES') {
           const text = collectPageText();
           sendResponse(text ? { text } : null);
+          return true;
+        }
+        if (m.type === 'GET_SEGMENT_COUNT') {
+          const count = segmentDocument().filter((s) => shouldRewrite(s).rewrite).length;
+          sendResponse({ count });
           return true;
         }
         return false;
