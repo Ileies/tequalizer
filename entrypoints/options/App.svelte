@@ -232,7 +232,7 @@
         <!-- ── API & Anbieter ── -->
         {#if activeTab === 'api'}
           <h1>API & Anbieter</h1>
-          <p class="page-desc">Verbinde Rewrite mit deinem bevorzugten KI-Anbieter.</p>
+          <p class="page-desc">Verbinde Tequalizer mit deinem bevorzugten KI-Anbieter.</p>
 
           <section class="card">
             <div class="field-label">Anbieter</div>
