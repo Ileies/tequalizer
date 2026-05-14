@@ -4,7 +4,7 @@
   import { DIMS } from '../../src/ui/dims.ts';
   import ToggleSwitch from '../../src/ui/components/ToggleSwitch.svelte';
   import ExtractPanel from './ExtractPanel.svelte';
-  import type { StoredState, StyleConfig } from '../../src/storage/schema.ts';
+  import type { StoredState, StyleConfig, Settings } from '../../src/storage/schema.ts';
   import type { ExtractedStyle } from '../../src/llm/styleExtractor.ts';
 
   let appState = $state<StoredState | null>(null);
@@ -12,6 +12,41 @@
   let extracting = $state(false);
   let extractResult = $state<ExtractedStyle | null>(null);
   let extractError = $state<string | null>(null);
+  let keyInput = $state('');
+  let showKey = $state(false);
+  let keySaving = $state(false);
+  let keySaved = $state(false);
+
+  function isProviderConfigured(settings: Settings): boolean {
+    if (settings.provider === 'openai') return Boolean(settings.apiKeys.openai);
+    if (settings.provider === 'claude') return Boolean(settings.apiKeys.claude);
+    return false;
+  }
+
+  function providerLabel(provider: Settings['provider']): string {
+    if (provider === 'openai') return 'OpenAI';
+    if (provider === 'claude') return 'Claude';
+    return 'Ollama';
+  }
+
+  function keyPlaceholder(provider: Settings['provider']): string {
+    if (provider === 'claude') return 'sk-ant-…';
+    return 'sk-…';
+  }
+
+  async function saveKey() {
+    if (!appState || !keyInput.trim() || keySaving) return;
+    keySaving = true;
+    const provider = appState.settings.provider;
+    const apiKeys = $state.snapshot(appState.settings.apiKeys);
+    await updateSettings({
+      apiKeys: { ...apiKeys, [provider]: keyInput.trim() },
+    });
+    appState = await getState();
+    keySaving = false;
+    keySaved = true;
+    setTimeout(() => { keySaved = false; }, 2000);
+  }
 
   $effect(() => {
     getState().then((s) => { appState = s; });
@@ -160,6 +195,61 @@
       >⚙</button>
     </header>
 
+    {#if !isProviderConfigured(appState.settings)}
+      <div class="px-4 py-5 flex flex-col gap-4">
+        <div class="flex items-start gap-3 bg-[#f9e2af]/8 border border-[#f9e2af]/20 rounded-lg px-4 py-3">
+          <span class="text-[#f9e2af] text-base leading-none mt-[1px]">!</span>
+          <div>
+            <div class="text-sm font-semibold text-[#f9e2af] mb-0.5">
+              {appState.settings.provider === 'ollama' ? 'Ollama nicht verfügbar' : 'API-Key fehlt'}
+            </div>
+            <div class="text-[12px] text-[#a6adc8] leading-snug">
+              {#if appState.settings.provider === 'ollama'}
+                Ollama-Unterstützung ist noch nicht implementiert. Wechsle zu OpenAI oder Claude.
+              {:else}
+                Für {providerLabel(appState.settings.provider)} wird ein API-Key benötigt.
+              {/if}
+            </div>
+          </div>
+        </div>
+
+        {#if appState.settings.provider !== 'ollama'}
+          <div>
+            <label class="block text-[11px] font-semibold uppercase tracking-[0.07em] text-[#6c7086] mb-2" for="popup-key-input">
+              {providerLabel(appState.settings.provider)} API-Key
+            </label>
+            <div class="flex gap-2 items-center">
+              <input
+                id="popup-key-input"
+                class="w-full bg-[#181825] text-[#cdd6f4] border border-[#313244] rounded-md px-[10px] py-[7px] text-sm focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
+                type={showKey ? 'text' : 'password'}
+                placeholder={keyPlaceholder(appState.settings.provider)}
+                bind:value={keyInput}
+                onkeydown={(e) => { if (e.key === 'Enter') saveKey(); }}
+              />
+              <button
+                class="cursor-pointer text-sm px-2 py-1.5 rounded-md shrink-0 leading-none text-[#6c7086] hover:bg-[#313244] hover:text-[#cdd6f4]"
+                onclick={() => (showKey = !showKey)}
+                title={showKey ? 'Verstecken' : 'Anzeigen'}
+              >{showKey ? '🙈' : '👁'}</button>
+            </div>
+          </div>
+
+          <button
+            class="block w-full text-center bg-[#89b4fa] text-[#1e1e2e] text-sm font-semibold py-[10px] rounded-[7px] cursor-pointer transition-colors duration-150 enabled:hover:bg-[#74c7ec] disabled:opacity-50 disabled:cursor-not-allowed"
+            onclick={saveKey}
+            disabled={!keyInput.trim() || keySaving}
+          >
+            {keySaving ? 'Speichern…' : keySaved ? 'Gespeichert ✓' : 'Speichern'}
+          </button>
+        {/if}
+
+        <button
+          class="block w-full text-center bg-[#313244] text-[#cdd6f4] text-sm font-medium py-[9px] rounded-[7px] cursor-pointer transition-colors duration-150 hover:bg-[#45475a]"
+          onclick={openOptions}
+        >Einstellungen öffnen</button>
+      </div>
+    {:else}
     <div>
       <section class="px-4 py-3 border-b border-[#313244]">
         <label class="block text-[11px] font-semibold uppercase tracking-[0.07em] text-[#6c7086] mb-2" for="style-select">Style</label>
@@ -252,6 +342,7 @@
         onDismiss={() => { extractResult = null; extractError = null; }}
       />
     </div>
+    {/if}
   {/if}
 </div>
 
