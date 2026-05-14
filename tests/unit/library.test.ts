@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { getLibrary, saveStyle, deleteStyle, createStyle } from '../../src/style-engine/library.ts';
 import { setState } from '../../src/storage/storageAdapter.ts';
-import { INITIAL_STATE, DEFAULT_STYLE } from '../../src/storage/schema.ts';
+import { INITIAL_STATE, DEFAULT_STYLE, PRESET_STYLES } from '../../src/storage/schema.ts';
 import type { StyleConfig } from '../../src/storage/schema.ts';
 
 const BASE_STATE = INITIAL_STATE;
@@ -17,14 +17,14 @@ const CUSTOM_STYLE: StyleConfig = {
 describe('getLibrary', () => {
   it('returns the default style library', async () => {
     const library = await getLibrary();
-    expect(library).toEqual([DEFAULT_STYLE]);
+    expect(library).toEqual([DEFAULT_STYLE, ...PRESET_STYLES]);
   });
 
   it('returns all styles after adding one', async () => {
     await setState({ ...BASE_STATE, styleLibrary: [DEFAULT_STYLE, CUSTOM_STYLE] });
     const library = await getLibrary();
     expect(library).toHaveLength(2);
-    expect(library[1].id).toBe(CUSTOM_STYLE.id);
+    expect(library[1]!.id).toBe(CUSTOM_STYLE.id);
   });
 });
 
@@ -50,9 +50,9 @@ describe('saveStyle', () => {
     await setState({ ...BASE_STATE, styleLibrary: [DEFAULT_STYLE, CUSTOM_STYLE, another] });
     await saveStyle({ ...CUSTOM_STYLE, name: 'Geändert' });
     const library = await getLibrary();
-    expect(library[0].id).toBe(DEFAULT_STYLE.id);
-    expect(library[1].id).toBe(CUSTOM_STYLE.id);
-    expect(library[2].id).toBe(another.id);
+    expect(library[0]!.id).toBe(DEFAULT_STYLE.id);
+    expect(library[1]!.id).toBe(CUSTOM_STYLE.id);
+    expect(library[2]!.id).toBe(another.id);
   });
 });
 

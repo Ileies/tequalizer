@@ -6,6 +6,8 @@ export async function sendMessage<T extends Message>(
   return browser.runtime.sendMessage(msg) as Promise<ResponseFor<T>>;
 }
 
-export function openPort(name: string): chrome.runtime.Port {
+type RuntimePort = ReturnType<typeof browser.runtime.connect>;
+
+export function openPort(name: string): RuntimePort {
   return browser.runtime.connect({ name });
 }

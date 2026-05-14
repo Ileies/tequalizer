@@ -65,21 +65,21 @@ describe('getActiveProvider', () => {
 describe('provider.isConfigured', () => {
   it('openai: true when apiKeys.openai is set', () => {
     const [openai] = getAllProviders().filter((p) => p.id === 'openai');
-    expect(openai.isConfigured({ ...BASE_SETTINGS, apiKeys: { openai: 'sk-key' } })).toBe(true);
+    expect(openai!.isConfigured({ ...BASE_SETTINGS, apiKeys: { openai: 'sk-key' } })).toBe(true);
   });
 
   it('openai: false when apiKeys.openai is missing', () => {
     const [openai] = getAllProviders().filter((p) => p.id === 'openai');
-    expect(openai.isConfigured({ ...BASE_SETTINGS, apiKeys: {} })).toBe(false);
+    expect(openai!.isConfigured({ ...BASE_SETTINGS, apiKeys: {} })).toBe(false);
   });
 
   it('claude: always false in V1', () => {
     const [claude] = getAllProviders().filter((p) => p.id === 'claude');
-    expect(claude.isConfigured(BASE_SETTINGS)).toBe(false);
+    expect(claude!.isConfigured(BASE_SETTINGS)).toBe(false);
   });
 
   it('ollama: always false in V1', () => {
     const [ollama] = getAllProviders().filter((p) => p.id === 'ollama');
-    expect(ollama.isConfigured(BASE_SETTINGS)).toBe(false);
+    expect(ollama!.isConfigured(BASE_SETTINGS)).toBe(false);
   });
 });

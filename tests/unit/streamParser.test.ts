@@ -14,12 +14,12 @@ function makeStream(chunks: string[]): ReadableStream<Uint8Array> {
 }
 
 function sseChunk(content: string): string {
-  return `data: ${JSON.stringify({ choices: [{ delta: { content }, finish_reason: null }], usage: null })}\n\n`;
+  return `data: ${JSON.stringify({ type: 'response.output_text.delta', delta: content })}\n\n`;
 }
 
 const DONE_WITH_USAGE = `data: ${JSON.stringify({
-  choices: [{ delta: {}, finish_reason: 'stop' }],
-  usage: { prompt_tokens: 10, completion_tokens: 5 },
+  type: 'response.completed',
+  response: { usage: { input_tokens: 10, output_tokens: 5 } },
 })}\n\ndata: [DONE]\n\n`;
 
 describe('parseSSEStream', () => {

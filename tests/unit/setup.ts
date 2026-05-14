@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, beforeEach } from 'vitest';
 
 // Minimal browser.storage.local mock for unit tests
 const store: Record<string, unknown> = {};

@@ -5,6 +5,7 @@
     "moduleResolution": "Bundler",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
@@ -21,5 +22,5 @@
     }
   },
   "include": ["**/*.ts", "**/*.svelte", ".wxt/wxt.d.ts"],
-  "exclude": [".output", "node_modules", ".wxt"]
+  "exclude": [".output", "node_modules"]
 }

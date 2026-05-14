@@ -60,7 +60,9 @@ async function handleMessage(
   }
 }
 
-async function handleRewritePort(port: chrome.runtime.Port): Promise<void> {
+type RewritePort = Parameters<Parameters<typeof browser.runtime.onConnect.addListener>[0]>[0];
+
+async function handleRewritePort(port: RewritePort): Promise<void> {
   const controller = new AbortController();
 
   port.onDisconnect.addListener(() => controller.abort());

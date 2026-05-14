@@ -2,8 +2,7 @@ import type { TokenUsage } from './types.ts';
 
 type ResponsesChunk =
   | { type: 'response.output_text.delta'; delta: string }
-  | { type: 'response.completed'; response: { usage: { input_tokens: number; output_tokens: number } } }
-  | { type: string };
+  | { type: 'response.completed'; response: { usage: { input_tokens: number; output_tokens: number } } };
 
 export async function* parseSSEStream(
   stream: ReadableStream<Uint8Array>
