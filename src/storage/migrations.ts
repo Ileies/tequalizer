@@ -35,12 +35,23 @@ const MIGRATIONS: Record<number, Migration> = {
     const missing = PRESET_STYLES.filter((p) => !existingIds.has(p.id));
     return { ...state, styleLibrary: [...library, ...missing] };
   },
+  4: (state) => {
+    const library = Array.isArray(state['styleLibrary']) ? state['styleLibrary'] : [];
+    return {
+      ...state,
+      styleLibrary: library.map((style: unknown) => {
+        if (typeof style !== 'object' || style === null) return style;
+        const { template: _template, ...rest } = style as Record<string, unknown>;
+        return rest;
+      }),
+    };
+  },
 };
 
 export function migrate(raw: Record<string, unknown>): Record<string, unknown> {
   let state = raw;
   const current = typeof state['schemaVersion'] === 'number' ? state['schemaVersion'] : 0;
-  const target = 3;
+  const target = 4;
 
   for (let v = current + 1; v <= target; v++) {
     const migration = MIGRATIONS[v];
@@ -51,4 +62,4 @@ export function migrate(raw: Record<string, unknown>): Record<string, unknown> {
   return state;
 }
 
-export const CURRENT_SCHEMA_VERSION: StoredState['schemaVersion'] = 3;
+export const CURRENT_SCHEMA_VERSION: StoredState['schemaVersion'] = 4;

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { TEMPLATES } from '../style-engine/presets.ts';
 
 export const StyleConfig = z.object({
   id: z.string().uuid(),
@@ -12,9 +11,6 @@ export const StyleConfig = z.object({
     formality: z.number().int().min(-2).max(2),
     simplicity: z.number().int().min(-2).max(2),
   }),
-  template: z
-    .enum(['none', 'ted_talk', 'bible', 'personal_letter', 'academic', 'tabloid'])
-    .default('none'),
   customInstructions: z.string().max(2000).optional(),
 });
 
@@ -60,24 +56,15 @@ export const DEFAULT_STYLE: StyleConfig = {
   name: 'Neutral',
   builtIn: true,
   dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0, simplicity: 0 },
-  template: 'none',
 };
 
-const PRESET_STYLE_IDS: Record<string, string> = {
-  ted_talk: '00000000-0000-0000-0000-000000000002',
-  bible: '00000000-0000-0000-0000-000000000003',
-  personal_letter: '00000000-0000-0000-0000-000000000004',
-  academic: '00000000-0000-0000-0000-000000000005',
-  tabloid: '00000000-0000-0000-0000-000000000006',
-};
-
-export const PRESET_STYLES: StyleConfig[] = Object.entries(TEMPLATES).map(([key, tmpl]) => ({
-  id: PRESET_STYLE_IDS[key]!,
-  name: tmpl.label,
-  builtIn: true,
-  dimensions: tmpl.defaultDimensions,
-  template: key as StyleConfig['template'],
-}));
+export const PRESET_STYLES: StyleConfig[] = [
+  { id: '00000000-0000-0000-0000-000000000002', name: 'TED Talk', builtIn: true, dimensions: { length: 1, imagery: 1, warmth: 1, formality: -1, simplicity: 1 } },
+  { id: '00000000-0000-0000-0000-000000000003', name: 'Bibel', builtIn: true, dimensions: { length: 0, imagery: 1, warmth: 0, formality: 1, simplicity: 0 } },
+  { id: '00000000-0000-0000-0000-000000000004', name: 'Brief', builtIn: true, dimensions: { length: 0, imagery: 0, warmth: 2, formality: -1, simplicity: 1 } },
+  { id: '00000000-0000-0000-0000-000000000005', name: 'Akademisch', builtIn: true, dimensions: { length: 0, imagery: -1, warmth: -1, formality: 2, simplicity: -1 } },
+  { id: '00000000-0000-0000-0000-000000000006', name: 'Boulevard', builtIn: true, dimensions: { length: -1, imagery: 1, warmth: 1, formality: -1, simplicity: 2 } },
+];
 
 export const INITIAL_STATE: StoredState = {
   settings: {
@@ -89,5 +76,5 @@ export const INITIAL_STATE: StoredState = {
     knownKnowledge: { enabled: false, profileText: '' },
   },
   styleLibrary: [DEFAULT_STYLE, ...PRESET_STYLES],
-  schemaVersion: 3,
+  schemaVersion: 4,
 };

@@ -19,7 +19,7 @@ test('popup style selector is populated with built-in styles', async ({ context,
   await expect(select).toBeVisible();
 
   const count = await select.locator('option').count();
-  expect(count).toBeGreaterThanOrEqual(6); // Neutral + 5 template presets
+  expect(count).toBeGreaterThanOrEqual(6); // Neutral + 5 preset styles
 
   await page.close();
 });

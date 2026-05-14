@@ -124,7 +124,6 @@
       name: 'Benutzerdefiniert',
       dimensions: pendingDimensions,
       customInstructions: base.customInstructions,
-      template: base.template,
     });
     await saveStyle(newStyle);
     await updateSettings({ activeStyleId: newStyle.id });
@@ -214,7 +213,6 @@
       ...base,
       dimensions: extractResult.dimensions,
       customInstructions: extractResult.customInstructions || base.customInstructions,
-      template: 'none',
     });
     await refresh();
     extractResult = null;
@@ -229,7 +227,6 @@
       name: `Stil von ${hostname}`,
       dimensions: extractResult.dimensions,
       customInstructions: extractResult.customInstructions,
-      template: 'none',
     });
     await saveStyle(newStyle);
     await updateSettings({ activeStyleId: newStyle.id });

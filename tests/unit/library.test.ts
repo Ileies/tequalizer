@@ -11,7 +11,6 @@ const CUSTOM_STYLE: StyleConfig = {
   name: 'Mein Stil',
   builtIn: false,
   dimensions: { length: 1, imagery: -1, warmth: 0, formality: 0, simplicity: 0 },
-  template: 'none',
 };
 
 describe('getLibrary', () => {
@@ -76,7 +75,6 @@ describe('createStyle', () => {
     const style = createStyle({
       name: 'Test',
       dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0, simplicity: 0 },
-      template: 'none',
     });
     expect(style.id).toMatch(/^[0-9a-f-]{36}$/);
     expect(style.builtIn).toBe(false);
@@ -84,8 +82,8 @@ describe('createStyle', () => {
   });
 
   it('each call produces a unique id', () => {
-    const a = createStyle({ name: 'A', dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0, simplicity: 0 }, template: 'none' });
-    const b = createStyle({ name: 'B', dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0, simplicity: 0 }, template: 'none' });
+    const a = createStyle({ name: 'A', dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0, simplicity: 0 } });
+    const b = createStyle({ name: 'B', dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0, simplicity: 0 } });
     expect(a.id).not.toBe(b.id);
   });
 });

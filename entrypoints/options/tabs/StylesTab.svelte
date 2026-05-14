@@ -19,7 +19,6 @@
     editStyle = createStyle({
       name: '',
       dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0, simplicity: 0 },
-      template: 'none',
     });
     isNewStyle = true;
   }
