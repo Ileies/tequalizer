@@ -24,6 +24,7 @@
     { key: 'imagery', label: 'Bildlichkeit', min: 'Sachlich', max: 'Bildhaft' },
     { key: 'warmth', label: 'Wärme', min: 'Kalt', max: 'Warm' },
     { key: 'formality', label: 'Formalität', min: 'Locker', max: 'Förmlich' },
+    { key: 'simplicity', label: 'Einfachheit', min: 'Komplex', max: 'Einfach' },
   ];
 
   const OPENAI_MODELS: Settings['openaiModel'][] = ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o', 'gpt-4o-mini', 'gpt-5.4-mini'];
@@ -81,14 +82,16 @@
 
   async function saveOpenaiKey(key: string) {
     if (!appState) return;
-    await updateSettings({ apiKeys: { ...appState.settings.apiKeys, openai: key } });
+    const apiKeys = $state.snapshot(appState.settings.apiKeys);
+    await updateSettings({ apiKeys: { ...apiKeys, openai: key } });
     appState = await getState();
     showSaved();
   }
 
   async function saveClaudeKey(key: string) {
     if (!appState) return;
-    await updateSettings({ apiKeys: { ...appState.settings.apiKeys, claude: key } });
+    const apiKeys = $state.snapshot(appState.settings.apiKeys);
+    await updateSettings({ apiKeys: { ...apiKeys, claude: key } });
     appState = await getState();
     showSaved();
   }
@@ -117,7 +120,7 @@
   function openNewStyle() {
     editStyle = createStyle({
       name: '',
-      dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0 },
+      dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0, simplicity: 0 },
       template: 'none',
     });
     isNewStyle = true;
@@ -135,12 +138,13 @@
 
   async function submitStyle() {
     if (!editStyle || !editStyle.name.trim()) return;
-    await saveStyle(editStyle);
+    const styleSnap = $state.snapshot(editStyle) as StyleConfig;
+    await saveStyle(styleSnap);
     if (isNewStyle && appState) {
       // Auto-set as active if it's the first custom style
       const state = await getState();
       if (state.styleLibrary.length === 2) {
-        await updateSettings({ activeStyleId: editStyle.id });
+        await updateSettings({ activeStyleId: styleSnap.id });
       }
     }
     appState = await getState();
@@ -163,29 +167,26 @@
 
   async function saveAutoEnabled(enabled: boolean) {
     if (!appState) return;
-    await updateSettings({
-      autoRewrite: { ...appState.settings.autoRewrite, enabled },
-    });
+    const autoRewrite = $state.snapshot(appState.settings.autoRewrite);
+    await updateSettings({ autoRewrite: { ...autoRewrite, enabled } });
     appState = await getState();
   }
 
   async function saveMinWordCount(count: number) {
     if (!appState) return;
-    await updateSettings({
-      autoRewrite: { ...appState.settings.autoRewrite, minWordCount: count },
-    });
+    const autoRewrite = $state.snapshot(appState.settings.autoRewrite);
+    await updateSettings({ autoRewrite: { ...autoRewrite, minWordCount: count } });
     appState = await getState();
   }
 
   async function saveExcludeDomains() {
     if (!appState) return;
+    const autoRewrite = $state.snapshot(appState.settings.autoRewrite);
     const domains = excludeDomainsText
       .split('\n')
       .map((d) => d.trim())
       .filter(Boolean);
-    await updateSettings({
-      autoRewrite: { ...appState.settings.autoRewrite, excludeDomains: domains },
-    });
+    await updateSettings({ autoRewrite: { ...autoRewrite, excludeDomains: domains } });
     appState = await getState();
     showSaved();
   }
@@ -194,17 +195,15 @@
 
   async function saveKnowledgeEnabled(enabled: boolean) {
     if (!appState) return;
-    await updateSettings({
-      knownKnowledge: { ...appState.settings.knownKnowledge, enabled },
-    });
+    const knownKnowledge = $state.snapshot(appState.settings.knownKnowledge);
+    await updateSettings({ knownKnowledge: { ...knownKnowledge, enabled } });
     appState = await getState();
   }
 
   async function saveProfileText(text: string) {
     if (!appState) return;
-    await updateSettings({
-      knownKnowledge: { ...appState.settings.knownKnowledge, profileText: text },
-    });
+    const knownKnowledge = $state.snapshot(appState.settings.knownKnowledge);
+    await updateSettings({ knownKnowledge: { ...knownKnowledge, profileText: text } });
     appState = await getState();
     showSaved();
   }
@@ -216,7 +215,7 @@
   {:else}
     <div class="layout">
       <nav class="sidebar">
-        <div class="app-name">Rewrite</div>
+        <div class="app-name">Tequalizer</div>
         <button
           class="nav-item"
           class:active={activeTab === 'api'}
@@ -518,14 +517,21 @@
             <span class="dim-label">{dim.label}</span>
             <span class="dim-hints">{dim.min} → {dim.max}</span>
           </div>
-          <input
-            type="range"
-            min="-1"
-            max="1"
-            step="0.05"
-            class="slider"
-            bind:value={editStyle.dimensions[dim.key]}
-          />
+          <div class="slider-wrap">
+            <input
+              type="range"
+              min="-2"
+              max="2"
+              step="1"
+              class="slider"
+              bind:value={editStyle.dimensions[dim.key]}
+            />
+            <div class="slider-dots">
+              {#each [-2, -1, 0, 1, 2] as tick}
+                <span class="dot" class:dot-center={tick === 0}></span>
+              {/each}
+            </div>
+          </div>
         </div>
       {/each}
 
@@ -1073,6 +1079,34 @@
   .dim-hints {
     font-size: 11px;
     color: #6c7086;
+  }
+
+  .slider-wrap {
+    position: relative;
+    padding-bottom: 12px;
+  }
+
+  .slider-dots {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 8px;
+    pointer-events: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #45475a;
+    flex-shrink: 0;
+  }
+
+  .dot-center {
+    background: #585b70;
   }
 
   /* Template chips */

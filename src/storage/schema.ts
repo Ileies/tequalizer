@@ -5,10 +5,11 @@ export const StyleConfig = z.object({
   name: z.string(),
   builtIn: z.boolean(),
   dimensions: z.object({
-    length: z.number().min(-1).max(1),
-    imagery: z.number().min(-1).max(1),
-    warmth: z.number().min(-1).max(1),
-    formality: z.number().min(-1).max(1),
+    length: z.number().int().min(-2).max(2),
+    imagery: z.number().int().min(-2).max(2),
+    warmth: z.number().int().min(-2).max(2),
+    formality: z.number().int().min(-2).max(2),
+    simplicity: z.number().int().min(-2).max(2),
   }),
   template: z
     .enum(['none', 'ted_talk', 'bible', 'personal_letter', 'academic', 'tabloid'])
@@ -57,7 +58,7 @@ export const DEFAULT_STYLE: StyleConfig = {
   id: DEFAULT_STYLE_ID,
   name: 'Neutral',
   builtIn: true,
-  dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0 },
+  dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0, simplicity: 0 },
   template: 'none',
 };
 
@@ -71,5 +72,5 @@ export const INITIAL_STATE: StoredState = {
     knownKnowledge: { enabled: false, profileText: '' },
   },
   styleLibrary: [DEFAULT_STYLE],
-  schemaVersion: 1,
+  schemaVersion: 2,
 };

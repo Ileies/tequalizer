@@ -10,7 +10,7 @@ const CUSTOM_STYLE: StyleConfig = {
   id: '11111111-1111-1111-1111-111111111111',
   name: 'Mein Stil',
   builtIn: false,
-  dimensions: { length: 0.5, imagery: -0.5, warmth: 0, formality: 0 },
+  dimensions: { length: 1, imagery: -1, warmth: 0, formality: 0, simplicity: 0 },
   template: 'none',
 };
 
@@ -75,7 +75,7 @@ describe('createStyle', () => {
   it('generates a UUID id and sets builtIn to false', () => {
     const style = createStyle({
       name: 'Test',
-      dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0 },
+      dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0, simplicity: 0 },
       template: 'none',
     });
     expect(style.id).toMatch(/^[0-9a-f-]{36}$/);
@@ -84,8 +84,8 @@ describe('createStyle', () => {
   });
 
   it('each call produces a unique id', () => {
-    const a = createStyle({ name: 'A', dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0 }, template: 'none' });
-    const b = createStyle({ name: 'B', dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0 }, template: 'none' });
+    const a = createStyle({ name: 'A', dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0, simplicity: 0 }, template: 'none' });
+    const b = createStyle({ name: 'B', dimensions: { length: 0, imagery: 0, warmth: 0, formality: 0, simplicity: 0 }, template: 'none' });
     expect(a.id).not.toBe(b.id);
   });
 });

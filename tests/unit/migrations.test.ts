@@ -8,9 +8,9 @@ describe('migrate', () => {
   });
 
   it('is idempotent — migrating an already-current state changes nothing', () => {
-    const state = { settings: {}, styleLibrary: [], schemaVersion: 1 };
+    const state = { settings: {}, styleLibrary: [], schemaVersion: CURRENT_SCHEMA_VERSION };
     const result = migrate(state);
-    expect(result['schemaVersion']).toBe(1);
+    expect(result['schemaVersion']).toBe(CURRENT_SCHEMA_VERSION);
     expect(result['settings']).toEqual({});
   });
 });

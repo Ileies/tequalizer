@@ -23,19 +23,19 @@ describe('buildPrompt', () => {
     expect(systemPrompt).toContain('Behalte ungefähre Länge des Originals');
   });
 
-  it('compact length dimension (-1) produces compress fragment', () => {
+  it('compact length dimension (-2) produces compress fragment', () => {
     const style: StyleConfig = {
       ...DEFAULT_STYLE,
-      dimensions: { ...DEFAULT_STYLE.dimensions, length: -1 },
+      dimensions: { ...DEFAULT_STYLE.dimensions, length: -2 },
     };
     const { systemPrompt } = buildPrompt(TEXT, style, BASE_SETTINGS);
     expect(systemPrompt).toContain('maximal komprimiert');
   });
 
-  it('verbose length dimension (+1) produces expand fragment', () => {
+  it('verbose length dimension (+2) produces expand fragment', () => {
     const style: StyleConfig = {
       ...DEFAULT_STYLE,
-      dimensions: { ...DEFAULT_STYLE.dimensions, length: 1 },
+      dimensions: { ...DEFAULT_STYLE.dimensions, length: 2 },
     };
     const { systemPrompt } = buildPrompt(TEXT, style, BASE_SETTINGS);
     expect(systemPrompt).toContain('1.5×');

@@ -22,6 +22,7 @@
     { key: 'imagery', label: 'Bildlichkeit', min: 'Sachlich', max: 'Bildhaft' },
     { key: 'warmth', label: 'Wärme', min: 'Kalt', max: 'Warm' },
     { key: 'formality', label: 'Formalität', min: 'Locker', max: 'Förmlich' },
+    { key: 'simplicity', label: 'Einfachheit', min: 'Komplex', max: 'Einfach' },
   ];
 
   let appState = $state<StoredState | null>(null);
@@ -117,7 +118,7 @@
     <div class="loading">Laden…</div>
   {:else}
     <header>
-      <span class="title">Rewrite</span>
+      <span class="title">Tequalizer</span>
       <button class="icon-btn" onclick={openOptions} title="Einstellungen">⚙</button>
     </header>
 
@@ -144,15 +145,22 @@
                 <span class="dim-label">{dim.label}</span>
                 <span class="dim-hints">{dim.min} → {dim.max}</span>
               </div>
-              <input
-                type="range"
-                min="-1"
-                max="1"
-                step="0.05"
-                class="slider"
-                value={activeStyle.dimensions[dim.key]}
-                onchange={(e) => onDimChange(dim.key, Number(e.currentTarget.value))}
-              />
+              <div class="slider-wrap">
+                <input
+                  type="range"
+                  min="-2"
+                  max="2"
+                  step="1"
+                  class="slider"
+                  value={activeStyle.dimensions[dim.key]}
+                  onchange={(e) => onDimChange(dim.key, Number(e.currentTarget.value))}
+                />
+                <div class="slider-dots">
+                  {#each [-2, -1, 0, 1, 2] as tick}
+                    <span class="dot" class:dot-center={tick === 0}></span>
+                  {/each}
+                </div>
+              </div>
             </div>
           {/each}
         </section>
@@ -326,6 +334,34 @@
   .dim-hints {
     font-size: 11px;
     color: #6c7086;
+  }
+
+  .slider-wrap {
+    position: relative;
+    padding-bottom: 12px;
+  }
+
+  .slider-dots {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 8px;
+    pointer-events: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #45475a;
+    flex-shrink: 0;
+  }
+
+  .dot-center {
+    background: #585b70;
   }
 
   .slider {

@@ -9,7 +9,7 @@ export default defineConfig({
   manifestVersion: 3,
   suppressWarnings: { firefoxDataCollection: true },
   manifest: ({ browser }) => ({
-    name: 'Rewrite — Texte in deinem Stil',
+    name: 'Tequalizer — Texte in deinem Stil',
     description: 'Formuliert Artikel und Blogeinträge in deinen bevorzugten Stil um.',
     permissions: ['storage', 'activeTab', 'scripting'],
     host_permissions: ['<all_urls>', 'https://api.openai.com/*'],
