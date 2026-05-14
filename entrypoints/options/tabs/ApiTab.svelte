@@ -65,15 +65,15 @@
   }
 </script>
 
-<h1 class="block text-[26px] font-bold text-[#cdd6f4] tracking-[-0.02em] mb-1.5">API & Anbieter</h1>
-<p class="block text-sm text-[#6c7086] mb-8 leading-normal">Verbinde Rewrite mit deinem bevorzugten KI-Anbieter.</p>
+<h1 class="block text-[26px] font-bold text-base-content tracking-[-0.02em] mb-1.5">API & Anbieter</h1>
+<p class="block text-sm text-muted mb-8 leading-normal">Verbinde Rewrite mit deinem bevorzugten KI-Anbieter.</p>
 
-<section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
-  <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3">Anbieter</div>
+<section class="bg-base-200 border border-base-300 rounded-xl px-7 py-6 mb-5">
+  <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted mb-3">Anbieter</div>
   <div class="flex gap-2">
     {#each (['openai', 'claude', 'ollama'] as const) as p}
       <button
-        class="text-sm px-[22px] py-[9px] rounded-lg border cursor-pointer transition-[background,color,border-color] duration-[0.12s] {appState.settings.provider === p ? 'bg-[#89b4fa] text-[#1e1e2e] border-[#89b4fa] font-semibold' : 'bg-[#1e1e2e] text-[#a6adc8] border-[#313244] hover:bg-[#313244] hover:text-[#cdd6f4]'}"
+        class="text-sm px-[22px] py-[9px] rounded-lg cursor-pointer transition-[background,color,border-color] duration-[0.12s] {appState.settings.provider === p ? 'btn border border-primary bg-primary text-primary-content font-semibold' : 'btn bg-base-100 text-subtext border-base-300 hover:bg-base-300 hover:text-base-content'}"
         onclick={() => saveProvider(p)}
       >
         {p === 'openai' ? 'OpenAI' : p === 'claude' ? 'Claude' : 'Ollama'}
@@ -83,25 +83,25 @@
 </section>
 
 {#if appState.settings.provider === 'openai'}
-  <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
-    <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3">OpenAI API-Key</div>
+  <section class="bg-base-200 border border-base-300 rounded-xl px-7 py-6 mb-5">
+    <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted mb-3">OpenAI API-Key</div>
     <div class="flex gap-2 items-center">
       <input
-        class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-[10px] text-sm focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
+        class="input input-bordered w-full"
         type={showOpenaiKey ? 'text' : 'password'}
         placeholder="sk-…"
         value={appState.settings.apiKeys.openai ?? ''}
         onchange={(e) => saveOpenaiKey(e.currentTarget.value)}
       />
       <button
-        class="cursor-pointer text-base px-2 py-1.5 rounded-md shrink-0 leading-none hover:bg-[#313244]"
+        class="btn btn-ghost btn-sm"
         onclick={() => (showOpenaiKey = !showOpenaiKey)}
       >{showOpenaiKey ? '🙈' : '👁'}</button>
     </div>
 
-    <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3 mt-5">Modell</div>
+    <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted mb-3 mt-5">Modell</div>
     <select
-      class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-[10px] text-sm cursor-pointer focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px]"
+      class="select select-bordered w-full"
       value={appState.settings.openaiModel}
       onchange={(e) => saveOpenaiModel(e.currentTarget.value as Settings['openaiModel'])}
     >
@@ -113,21 +113,21 @@
 {/if}
 
 {#if appState.settings.provider === 'claude'}
-  <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
+  <section class="bg-base-200 border border-base-300 rounded-xl px-7 py-6 mb-5">
     <div class="flex items-center gap-[10px] mb-3">
-      <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086]">Claude API-Key</div>
-      <span class="text-[11px] font-semibold px-2 py-[3px] rounded-full bg-[#313244] text-[#a6adc8]">Experimentell</span>
+      <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted">Claude API-Key</div>
+      <span class="badge bg-base-300 text-subtext border-0">Experimentell</span>
     </div>
     <div class="flex gap-2 items-center">
       <input
-        class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-[10px] text-sm focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
+        class="input input-bordered w-full"
         type={showClaudeKey ? 'text' : 'password'}
         placeholder="sk-ant-…"
         value={appState.settings.apiKeys.claude ?? ''}
         onchange={(e) => saveClaudeKey(e.currentTarget.value)}
       />
       <button
-        class="cursor-pointer text-base px-2 py-1.5 rounded-md shrink-0 leading-none hover:bg-[#313244]"
+        class="btn btn-ghost btn-sm"
         onclick={() => (showClaudeKey = !showClaudeKey)}
       >{showClaudeKey ? '🙈' : '👁'}</button>
     </div>
@@ -135,19 +135,19 @@
 {/if}
 
 {#if appState.settings.provider === 'ollama'}
-  <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
-    <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3">Ollama Endpoint</div>
+  <section class="bg-base-200 border border-base-300 rounded-xl px-7 py-6 mb-5">
+    <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted mb-3">Ollama Endpoint</div>
     <input
-      class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-[10px] text-sm focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
+      class="input input-bordered w-full"
       type="url"
       placeholder="http://localhost:11434"
       value={appState.settings.ollamaEndpoint ?? ''}
       onchange={(e) => saveOllamaEndpoint(e.currentTarget.value)}
     />
 
-    <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3 mt-5">Modell</div>
+    <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted mb-3 mt-5">Modell</div>
     <input
-      class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-[10px] text-sm focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
+      class="input input-bordered w-full"
       type="text"
       placeholder="llama3"
       value={appState.settings.ollamaModel ?? ''}
@@ -157,5 +157,5 @@
 {/if}
 
 {#if savedMsg}
-  <div class="text-[13px] text-[#a6e3a1]">{savedMsg}</div>
+  <div class="text-[13px] text-success">{savedMsg}</div>
 {/if}

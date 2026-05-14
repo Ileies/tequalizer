@@ -25,24 +25,54 @@
   async function refresh() {
     appState = await getState();
   }
+
+  function handleTabKeydown(e: KeyboardEvent) {
+    const tabs = TABS.map(([t]) => t);
+    const current = tabs.indexOf(activeTab);
+    let next = current;
+    if (e.key === 'ArrowDown') { e.preventDefault(); next = (current + 1) % tabs.length; }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); next = (current - 1 + tabs.length) % tabs.length; }
+    else if (e.key === 'Home') { e.preventDefault(); next = 0; }
+    else if (e.key === 'End') { e.preventDefault(); next = tabs.length - 1; }
+    else return;
+    activeTab = tabs[next]!;
+    document.getElementById(`tab-${tabs[next]}`)?.focus();
+  }
 </script>
 
 <div class="min-h-screen">
   {#if !appState}
-    <div class="p-20 text-center text-[#6c7086] text-sm">Laden…</div>
+    <div class="p-20 text-center text-muted text-sm">Laden…</div>
   {:else}
     <div class="flex min-h-screen">
-      <nav class="w-[260px] shrink-0 bg-[#181825] border-r border-[#313244] px-5 py-8 flex flex-col gap-0.5">
-        <div class="text-xl font-bold text-[#cdd6f4] tracking-[-0.01em] px-3 pb-5 border-b border-[#313244] mb-3">Tequalizer</div>
+      <nav
+        role="tablist"
+        aria-orientation="vertical"
+        aria-label="Einstellungen-Navigation"
+        class="w-[260px] shrink-0 bg-base-200 border-r border-base-300 px-5 py-8 flex flex-col gap-0.5"
+      >
+        <div class="text-xl font-bold text-base-content tracking-[-0.01em] px-3 pb-5 border-b border-base-300 mb-3">Tequalizer</div>
         {#each TABS as [tab, label]}
           <button
-            class="block w-full text-sm px-3 py-[10px] rounded-lg border-l-[3px] cursor-pointer transition-[background,color] duration-[0.12s] text-left {activeTab === tab ? 'bg-[#89b4fa]/10 text-[#89b4fa] font-semibold border-l-[#89b4fa]' : 'text-[#a6adc8] border-l-transparent hover:bg-[#313244]/70 hover:text-[#cdd6f4]'}"
+            id="tab-{tab}"
+            role="tab"
+            aria-selected={activeTab === tab}
+            aria-controls="panel-{tab}"
+            tabindex={activeTab === tab ? 0 : -1}
+            class="block w-full text-sm px-3 py-[10px] rounded-lg cursor-pointer transition-[background,color] duration-[0.12s] text-left {activeTab === tab ? 'bg-primary/10 text-primary font-semibold' : 'text-subtext hover:bg-base-300/70 hover:text-base-content'}"
             onclick={() => (activeTab = tab)}
+            onkeydown={handleTabKeydown}
           >{label}</button>
         {/each}
       </nav>
 
-      <main class="flex-1 px-16 py-[52px] max-w-[820px]">
+      <main
+        id="panel-{activeTab}"
+        role="tabpanel"
+        aria-labelledby="tab-{activeTab}"
+        tabindex="0"
+        class="flex-1 px-16 py-[52px] max-w-[820px] focus:outline-none"
+      >
         {#if activeTab === 'api'}
           <ApiTab appState={appState} onRefresh={refresh} />
         {:else if activeTab === 'styles'}

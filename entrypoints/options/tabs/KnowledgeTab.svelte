@@ -55,12 +55,12 @@
 
 <section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
   <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3">Profil-Text</div>
-  <div class="text-[13px] text-[#6c7086] mb-[14px] leading-[1.55]">Beschreibe deinen Schreibstil, dein Publikum oder andere Hinweise für das Modell.</div>
+  <div class="text-[13px] text-[#6c7086] mb-[14px] leading-[1.55]">Beschreibe, wie Artikel umgeschrieben werden sollen — z. B. gewünschter Ton, Komplexität oder thematische Schwerpunkte.</div>
   <textarea
     class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-3 text-sm resize-y leading-[1.6] focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
     rows="10"
     maxlength="2000"
-    placeholder="Ich schreibe für ein technisch versiertes Publikum…"
+    placeholder="Technische Fachbegriffe sollen erklärt und der Text auf das Wesentliche gekürzt werden…"
     bind:value={profileText}
   ></textarea>
   <div class="flex items-center gap-3 mt-4">
