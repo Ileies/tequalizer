@@ -7,6 +7,7 @@ import {
   finalizeStreaming,
   addHoverPreview,
   restoreOriginal,
+  getOriginal,
 } from './domSurgeon.ts';
 
 export default defineContentScript({
@@ -69,7 +70,7 @@ async function segmentRewriter(
   return new Promise<void>((resolve, reject) => {
     port.postMessage({
       type: 'REWRITE_REQUEST',
-      payload: { text: segment.text, styleId, requestId },
+      payload: { text: getOriginal(segment.element) ?? segment.text, styleId, requestId },
     });
 
     port.onMessage.addListener((msg: { type: string; payload: Record<string, string> }) => {
