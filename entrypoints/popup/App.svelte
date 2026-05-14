@@ -123,6 +123,12 @@
                 <span class="dim-hints">{dim.min} → {dim.max}</span>
               </div>
               <div class="slider-wrap">
+                <div class="slider-track"></div>
+                <div class="slider-dots">
+                  {#each [-2, -1, 0, 1, 2] as tick}
+                    <span class="dot" class:dot-center={tick === 0}></span>
+                  {/each}
+                </div>
                 <input
                   type="range"
                   min="-2"
@@ -132,11 +138,6 @@
                   value={activeStyle.dimensions[dim.key]}
                   onchange={(e) => onDimChange(dim.key, Number(e.currentTarget.value))}
                 />
-                <div class="slider-dots">
-                  {#each [-2, -1, 0, 1, 2] as tick}
-                    <span class="dot" class:dot-center={tick === 0}></span>
-                  {/each}
-                </div>
               </div>
             </div>
           {/each}
@@ -306,6 +307,36 @@
     align-items: center;
   }
 
+  /* Fake track ends exactly where the dots end — no overrun */
+  .slider-track {
+    position: absolute;
+    left: 7px;
+    right: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 3px;
+    background: #313244;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Dots above track, below thumb */
+  .slider-dots {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    /* padding = thumb_width/2 - dot_width/2 = 7 - 3 = 4px */
+    padding: 0 4px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Thumb above dots via z-index on the input */
   .slider {
     -webkit-appearance: none;
     appearance: none;
@@ -316,19 +347,18 @@
     padding: 0;
     margin: 0;
     position: relative;
-    z-index: 1;
+    z-index: 2;
   }
 
+  /* Native track is hidden — fake track used instead */
   .slider::-webkit-slider-runnable-track {
     height: 3px;
-    background: #313244;
-    border-radius: 2px;
+    background: transparent;
   }
 
   .slider::-moz-range-track {
     height: 3px;
-    background: #313244;
-    border-radius: 2px;
+    background: transparent;
     border: none;
   }
 
@@ -363,23 +393,9 @@
     box-shadow: 0 0 0 4px rgba(137, 180, 250, 0.2);
   }
 
-  .slider-dots {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    justify-content: space-between;
-    /* padding = thumb_width/2 - dot_width/2 = 7 - 2 = 5px → dot centers align with thumb centers */
-    padding: 0 5px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
   .dot {
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: #45475a;
     flex-shrink: 0;
