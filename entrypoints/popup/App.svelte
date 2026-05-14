@@ -2,16 +2,6 @@
   import { getState, updateSettings } from '../../src/storage/storageAdapter.ts';
   import { saveStyle } from '../../src/style-engine/library.ts';
   import type { StoredState, StyleConfig } from '../../src/storage/schema.ts';
-  import { TEMPLATES as TEMPLATE_DATA } from '../../src/style-engine/presets.ts';
-
-  const TEMPLATES: Array<{ id: StyleConfig['template']; label: string }> = [
-    { id: 'none', label: 'Keins' },
-    ...Object.entries(TEMPLATE_DATA).map(([id, t]) => ({
-      id: id as StyleConfig['template'],
-      label: t.label,
-    })),
-  ];
-
   const DIMS: Array<{
     key: keyof StyleConfig['dimensions'];
     label: string;
@@ -52,19 +42,6 @@
     const updated: StyleConfig = {
       ...base,
       dimensions: { ...base.dimensions, [key]: value },
-    };
-    await saveStyle(updated);
-    appState = await getState();
-  }
-
-  async function onTemplateClick(template: StyleConfig['template']) {
-    if (!appState || !activeStyle) return;
-    const tmpl = template !== 'none' ? TEMPLATE_DATA[template] : null;
-    const base = $state.snapshot(activeStyle) as StyleConfig;
-    const updated: StyleConfig = {
-      ...base,
-      template,
-      dimensions: tmpl ? { ...tmpl.defaultDimensions } : base.dimensions,
     };
     await saveStyle(updated);
     appState = await getState();
@@ -165,20 +142,6 @@
           {/each}
         </section>
 
-        <section class="section">
-          <div class="label">Vorlage</div>
-          <div class="chips">
-            {#each TEMPLATES as t}
-              <button
-                class="chip"
-                class:chip-active={activeStyle.template === t.id}
-                onclick={() => onTemplateClick(t.id)}
-              >
-                {t.label}
-              </button>
-            {/each}
-          </div>
-        </section>
       {/if}
 
       <section class="section toggles">
@@ -368,41 +331,6 @@
     width: 100%;
     accent-color: #89b4fa;
     cursor: pointer;
-  }
-
-  /* Template chips */
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .chip {
-    all: unset;
-    font-family: inherit;
-    font-size: 12px;
-    padding: 4px 10px;
-    border-radius: 99px;
-    border: 1px solid #313244;
-    background: #181825;
-    color: #a6adc8;
-    cursor: pointer;
-    transition:
-      background 0.12s,
-      color 0.12s,
-      border-color 0.12s;
-  }
-
-  .chip:hover {
-    background: #313244;
-    color: #cdd6f4;
-  }
-
-  .chip-active {
-    background: #89b4fa;
-    color: #1e1e2e;
-    border-color: #89b4fa;
-    font-weight: 600;
   }
 
   /* Toggles */

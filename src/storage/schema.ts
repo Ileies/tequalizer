@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TEMPLATES } from '../style-engine/presets.ts';
 
 export const StyleConfig = z.object({
   id: z.string().uuid(),
@@ -62,6 +63,22 @@ export const DEFAULT_STYLE: StyleConfig = {
   template: 'none',
 };
 
+const PRESET_STYLE_IDS: Record<string, string> = {
+  ted_talk: '00000000-0000-0000-0000-000000000002',
+  bible: '00000000-0000-0000-0000-000000000003',
+  personal_letter: '00000000-0000-0000-0000-000000000004',
+  academic: '00000000-0000-0000-0000-000000000005',
+  tabloid: '00000000-0000-0000-0000-000000000006',
+};
+
+export const PRESET_STYLES: StyleConfig[] = Object.entries(TEMPLATES).map(([key, tmpl]) => ({
+  id: PRESET_STYLE_IDS[key]!,
+  name: tmpl.label,
+  builtIn: true,
+  dimensions: tmpl.defaultDimensions,
+  template: key as StyleConfig['template'],
+}));
+
 export const INITIAL_STATE: StoredState = {
   settings: {
     provider: 'openai',
@@ -71,6 +88,6 @@ export const INITIAL_STATE: StoredState = {
     autoRewrite: { enabled: false, minWordCount: 50, excludeDomains: [] },
     knownKnowledge: { enabled: false, profileText: '' },
   },
-  styleLibrary: [DEFAULT_STYLE],
-  schemaVersion: 2,
+  styleLibrary: [DEFAULT_STYLE, ...PRESET_STYLES],
+  schemaVersion: 3,
 };

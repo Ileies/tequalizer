@@ -2,17 +2,7 @@
   import { getState, updateSettings } from '../../src/storage/storageAdapter.ts';
   import { saveStyle, deleteStyle, createStyle } from '../../src/style-engine/library.ts';
   import type { StoredState, StyleConfig, Settings } from '../../src/storage/schema.ts';
-  import { TEMPLATES as TEMPLATE_DATA } from '../../src/style-engine/presets.ts';
-
   type Tab = 'api' | 'styles' | 'automode' | 'knowledge';
-
-  const TEMPLATES: Array<{ id: StyleConfig['template']; label: string }> = [
-    { id: 'none', label: 'Keins' },
-    ...Object.entries(TEMPLATE_DATA).map(([id, t]) => ({
-      id: id as StyleConfig['template'],
-      label: t.label,
-    })),
-  ];
 
   const DIMS: Array<{
     key: keyof StyleConfig['dimensions'];
@@ -358,9 +348,6 @@
                     {#if style.id === appState.settings.activeStyleId}
                       <span class="badge badge-active">Standard</span>
                     {/if}
-                    {#if style.template !== 'none'}
-                      <span class="badge">{TEMPLATES.find((t) => t.id === style.template)?.label ?? style.template}</span>
-                    {/if}
                   </div>
                 </div>
                 <div class="style-actions">
@@ -534,24 +521,6 @@
           </div>
         </div>
       {/each}
-
-      <div class="field-label" style="margin-top: 20px;">Vorlage</div>
-      <div class="chips">
-        {#each TEMPLATES as t}
-          <button
-            class="chip"
-            class:chip-active={editStyle.template === t.id}
-            onclick={() => {
-              if (!editStyle) return;
-              editStyle.template = t.id;
-              const tmpl = t.id !== 'none' ? TEMPLATE_DATA[t.id] : null;
-              if (tmpl) editStyle.dimensions = { ...tmpl.defaultDimensions };
-            }}
-          >
-            {t.label}
-          </button>
-        {/each}
-      </div>
 
       <div class="field-label" style="margin-top: 20px;">Eigene Anweisungen <span class="field-hint-inline">(optional, max. 2000 Zeichen)</span></div>
       <textarea
@@ -1107,38 +1076,6 @@
 
   .dot-center {
     background: #585b70;
-  }
-
-  /* Template chips */
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .chip {
-    all: unset;
-    font-family: inherit;
-    font-size: 13px;
-    padding: 6px 14px;
-    border-radius: 99px;
-    border: 1px solid #313244;
-    background: #1e1e2e;
-    color: #a6adc8;
-    cursor: pointer;
-    transition: background 0.12s, color 0.12s, border-color 0.12s;
-  }
-
-  .chip:hover {
-    background: #313244;
-    color: #cdd6f4;
-  }
-
-  .chip-active {
-    background: #89b4fa;
-    color: #1e1e2e;
-    border-color: #89b4fa;
-    font-weight: 600;
   }
 
   /* Dialog */

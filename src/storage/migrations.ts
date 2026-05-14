@@ -1,4 +1,5 @@
 import type { StoredState } from './schema.ts';
+import { PRESET_STYLES } from './schema.ts';
 
 type Migration = (state: Record<string, unknown>) => Record<string, unknown>;
 
@@ -26,12 +27,20 @@ const MIGRATIONS: Record<number, Migration> = {
       }),
     };
   },
+  3: (state) => {
+    const library = Array.isArray(state['styleLibrary']) ? state['styleLibrary'] : [];
+    const existingIds = new Set(
+      library.map((s: unknown) => (s as Record<string, unknown>)['id'])
+    );
+    const missing = PRESET_STYLES.filter((p) => !existingIds.has(p.id));
+    return { ...state, styleLibrary: [...library, ...missing] };
+  },
 };
 
 export function migrate(raw: Record<string, unknown>): Record<string, unknown> {
   let state = raw;
   const current = typeof state['schemaVersion'] === 'number' ? state['schemaVersion'] : 0;
-  const target = 2;
+  const target = 3;
 
   for (let v = current + 1; v <= target; v++) {
     const migration = MIGRATIONS[v];
@@ -42,4 +51,4 @@ export function migrate(raw: Record<string, unknown>): Record<string, unknown> {
   return state;
 }
 
-export const CURRENT_SCHEMA_VERSION: StoredState['schemaVersion'] = 2;
+export const CURRENT_SCHEMA_VERSION: StoredState['schemaVersion'] = 3;
