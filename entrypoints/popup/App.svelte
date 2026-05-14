@@ -301,16 +301,17 @@
 
   .slider-wrap {
     position: relative;
-    padding-bottom: 12px;
   }
 
   .slider-dots {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 0 8px;
     pointer-events: none;
     position: absolute;
-    bottom: 0;
+    top: 50%;
+    transform: translateY(-50%);
     left: 0;
     right: 0;
   }
