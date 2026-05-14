@@ -118,10 +118,7 @@
         <section class="section">
           {#each DIMS as dim}
             <div class="dim-row">
-              <div class="dim-header">
-                <span class="dim-label">{dim.label}</span>
-                <span class="dim-hints">{dim.min} → {dim.max}</span>
-              </div>
+              <span class="dim-hint">{dim.min}</span>
               <div class="slider-wrap">
                 <div class="slider-track"></div>
                 <div class="slider-dots">
@@ -139,6 +136,7 @@
                   onchange={(e) => onDimChange(dim.key, Number(e.currentTarget.value))}
                 />
               </div>
+              <span class="dim-hint">{dim.max}</span>
             </div>
           {/each}
         </section>
@@ -275,29 +273,26 @@
 
   /* Dimension sliders */
   .dim-row {
-    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
   }
 
   .dim-row:last-child {
     margin-bottom: 0;
   }
 
-  .dim-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 4px;
-  }
-
-  .dim-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #cdd6f4;
-  }
-
-  .dim-hints {
+  .dim-hint {
     font-size: 11px;
     color: #6c7086;
+    white-space: nowrap;
+    flex-shrink: 0;
+    width: 52px;
+  }
+
+  .dim-hint:last-child {
+    text-align: right;
   }
 
   .slider-wrap {
@@ -305,6 +300,7 @@
     height: 20px;
     display: flex;
     align-items: center;
+    flex: 1;
   }
 
   /* Fake track ends exactly where the dots end — no overrun */
