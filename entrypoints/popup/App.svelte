@@ -301,37 +301,92 @@
 
   .slider-wrap {
     position: relative;
+    height: 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  .slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 20px;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .slider::-webkit-slider-runnable-track {
+    height: 3px;
+    background: #313244;
+    border-radius: 2px;
+  }
+
+  .slider::-moz-range-track {
+    height: 3px;
+    background: #313244;
+    border-radius: 2px;
+    border: none;
+  }
+
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #89b4fa;
+    margin-top: -5.5px;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+  }
+
+  .slider:hover::-webkit-slider-thumb {
+    background: #b4d0ff;
+    box-shadow: 0 0 0 4px rgba(137, 180, 250, 0.2);
+  }
+
+  .slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #89b4fa;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+  }
+
+  .slider:hover::-moz-range-thumb {
+    background: #b4d0ff;
+    box-shadow: 0 0 0 4px rgba(137, 180, 250, 0.2);
   }
 
   .slider-dots {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 8px;
-    pointer-events: none;
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
     left: 0;
     right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    /* padding = thumb_width/2 - dot_width/2 = 7 - 2 = 5px → dot centers align with thumb centers */
+    padding: 0 5px;
+    pointer-events: none;
+    z-index: 0;
   }
 
   .dot {
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
     background: #45475a;
     flex-shrink: 0;
   }
 
   .dot-center {
-    background: #585b70;
-  }
-
-  .slider {
-    width: 100%;
-    accent-color: #89b4fa;
-    cursor: pointer;
+    background: #6c7086;
   }
 
   /* Toggles */
