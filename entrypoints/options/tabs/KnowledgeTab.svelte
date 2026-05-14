@@ -2,7 +2,6 @@
   import { untrack } from 'svelte';
   import { updateSettings } from '../../../src/storage/storageAdapter.ts';
   import type { StoredState } from '../../../src/storage/schema.ts';
-  import ToggleSwitch from '../../../src/ui/components/ToggleSwitch.svelte';
 
   let {
     appState,
@@ -36,41 +35,43 @@
   }
 </script>
 
-<h1 class="block text-[26px] font-bold text-[#cdd6f4] tracking-[-0.02em] mb-1.5">Bekanntes Wissen</h1>
-<p class="block text-sm text-[#6c7086] mb-8 leading-normal">Dein Profil wird beim Umformulieren als Kontext an das Modell übergeben.</p>
+<h1 class="block text-[26px] font-bold text-base-content tracking-[-0.02em] mb-1.5">Bekanntes Wissen</h1>
+<p class="block text-sm text-muted mb-8 leading-normal">Dein Profil wird beim Umformulieren als Kontext an das Modell übergeben.</p>
 
-<section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
+<section class="bg-base-200 border border-base-300 rounded-xl px-7 py-6 mb-5">
   <div class="flex items-center justify-between gap-5 py-0.5">
     <div>
-      <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-[2px]">Bekanntes Wissen verwenden</div>
-      <div class="text-[13px] text-[#6c7086] leading-[1.55]">Das Profil wird beim Umformulieren als Kontext übergeben.</div>
+      <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted mb-[2px]">Bekanntes Wissen verwenden</div>
+      <div class="text-[13px] text-muted leading-[1.55]">Das Profil wird beim Umformulieren als Kontext übergeben.</div>
     </div>
-    <ToggleSwitch
+    <input
+      type="checkbox"
+      class="toggle toggle-primary"
       checked={appState.settings.knownKnowledge.enabled}
-      label="Bekanntes Wissen aktivieren"
-      onToggle={() => saveKnowledgeEnabled(!appState.settings.knownKnowledge.enabled)}
+      onclick={() => saveKnowledgeEnabled(!appState.settings.knownKnowledge.enabled)}
+      aria-label="Bekanntes Wissen aktivieren"
     />
   </div>
 </section>
 
-<section class="bg-[#181825] border border-[#313244] rounded-xl px-7 py-6 mb-5">
-  <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-[#6c7086] mb-3">Profil-Text</div>
-  <div class="text-[13px] text-[#6c7086] mb-[14px] leading-[1.55]">Beschreibe, wie Artikel umgeschrieben werden sollen — z. B. gewünschter Ton, Komplexität oder thematische Schwerpunkte.</div>
+<section class="bg-base-200 border border-base-300 rounded-xl px-7 py-6 mb-5">
+  <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted mb-3">Profil-Text</div>
+  <div class="text-[13px] text-muted mb-[14px] leading-[1.55]">Beschreibe, wie Artikel umgeschrieben werden sollen — z. B. gewünschter Ton, Komplexität oder thematische Schwerpunkte.</div>
   <textarea
-    class="w-full bg-[#1e1e2e] text-[#cdd6f4] border border-[#313244] rounded-lg px-[14px] py-3 text-sm resize-y leading-[1.6] focus:outline-2 focus:outline-[#89b4fa] focus:outline-offset-[-2px] placeholder:text-[#45475a]"
+    class="textarea textarea-bordered w-full text-sm resize-y leading-[1.6]"
     rows="10"
     maxlength="2000"
     placeholder="Technische Fachbegriffe sollen erklärt und der Text auf das Wesentliche gekürzt werden…"
     bind:value={profileText}
   ></textarea>
   <div class="flex items-center gap-3 mt-4">
-    <span class="text-xs text-[#6c7086] ml-auto">{profileText.length} / 2000</span>
+    <span class="text-xs text-muted ml-auto">{profileText.length} / 2000</span>
     <button
-      class="bg-[#89b4fa] text-[#1e1e2e] text-sm font-semibold px-[22px] py-[10px] rounded-lg cursor-pointer transition-colors duration-150 hover:bg-[#74c7ec]"
+      class="btn btn-primary"
       onclick={() => saveProfileText(profileText)}
     >Speichern</button>
     {#if savedMsg}
-      <span class="text-[13px] text-[#a6e3a1]">{savedMsg}</span>
+      <span class="text-[13px] text-success">{savedMsg}</span>
     {/if}
   </div>
 </section>

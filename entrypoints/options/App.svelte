@@ -58,7 +58,7 @@
     <div class="p-20 text-center text-muted text-sm">Laden…</div>
   {:else}
     <div class="flex min-h-screen">
-      <nav
+      <div
         role="tablist"
         aria-orientation="vertical"
         aria-label="Einstellungen-Navigation"
@@ -84,9 +84,9 @@
             disabled={resetting}
           >{resetting ? 'Wird zurückgesetzt…' : 'Daten zurücksetzen'}</button>
         </div>
-      </nav>
+      </div>
 
-      <main
+      <div
         id="panel-{activeTab}"
         role="tabpanel"
         aria-labelledby="tab-{activeTab}"
@@ -102,7 +102,7 @@
         {:else if activeTab === 'knowledge'}
           <KnowledgeTab appState={appState} onRefresh={refresh} />
         {/if}
-      </main>
+      </div>
     </div>
   {/if}
 </div>
