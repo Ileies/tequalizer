@@ -27,7 +27,7 @@ export const Settings = z.object({
   ollamaEndpoint: z.string().url().optional(),
   ollamaModel: z.string().optional(),
   openaiModel: z
-    .enum(['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o', 'gpt-4o-mini'])
+    .enum(['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o', 'gpt-4o-mini', 'gpt-5.4-mini'])
     .default('gpt-4.1-mini'),
   activeStyleId: z.string().uuid(),
   autoRewrite: z.object({

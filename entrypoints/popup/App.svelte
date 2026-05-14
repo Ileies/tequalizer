@@ -47,9 +47,10 @@
 
   async function onDimChange(key: keyof StyleConfig['dimensions'], value: number) {
     if (!appState || !activeStyle) return;
+    const base = $state.snapshot(activeStyle) as StyleConfig;
     const updated: StyleConfig = {
-      ...activeStyle,
-      dimensions: { ...activeStyle.dimensions, [key]: value },
+      ...base,
+      dimensions: { ...base.dimensions, [key]: value },
     };
     await saveStyle(updated);
     appState = await getState();
@@ -58,10 +59,11 @@
   async function onTemplateClick(template: StyleConfig['template']) {
     if (!appState || !activeStyle) return;
     const tmpl = template !== 'none' ? TEMPLATE_DATA[template] : null;
+    const base = $state.snapshot(activeStyle) as StyleConfig;
     const updated: StyleConfig = {
-      ...activeStyle,
+      ...base,
       template,
-      dimensions: tmpl ? { ...tmpl.defaultDimensions } : activeStyle.dimensions,
+      dimensions: tmpl ? { ...tmpl.defaultDimensions } : base.dimensions,
     };
     await saveStyle(updated);
     appState = await getState();
@@ -69,22 +71,18 @@
 
   async function toggleAutoRewrite() {
     if (!appState) return;
+    const autoRewrite = $state.snapshot(appState.settings.autoRewrite);
     await updateSettings({
-      autoRewrite: {
-        ...appState.settings.autoRewrite,
-        enabled: !appState.settings.autoRewrite.enabled,
-      },
+      autoRewrite: { ...autoRewrite, enabled: !autoRewrite.enabled },
     });
     appState = await getState();
   }
 
   async function toggleKnowledge() {
     if (!appState) return;
+    const knownKnowledge = $state.snapshot(appState.settings.knownKnowledge);
     await updateSettings({
-      knownKnowledge: {
-        ...appState.settings.knownKnowledge,
-        enabled: !appState.settings.knownKnowledge.enabled,
-      },
+      knownKnowledge: { ...knownKnowledge, enabled: !knownKnowledge.enabled },
     });
     appState = await getState();
   }

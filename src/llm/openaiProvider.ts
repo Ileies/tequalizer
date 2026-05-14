@@ -2,7 +2,7 @@ import type { LLMProvider, RewriteRequest, StreamResult } from './types.ts';
 import type { Settings } from '../storage/schema.ts';
 import { parseSSEStream } from './streamParser.ts';
 
-const ENDPOINT = 'https://api.openai.com/v1/chat/completions';
+const ENDPOINT = 'https://api.openai.com/v1/responses';
 
 function mapHttpError(status: number, body: string): string {
   if (status === 401) return 'Ungültiger API-Key. Bitte in den Einstellungen prüfen.';
@@ -53,13 +53,10 @@ export const openaiProvider: LLMProvider = {
       body: JSON.stringify({
         model,
         stream: true,
-        stream_options: { include_usage: true },
         temperature: req.temperature ?? 0.7,
-        max_tokens: req.maxTokens ?? 4096,
-        messages: [
-          { role: 'system', content: req.systemPrompt },
-          { role: 'user', content: req.userPrompt },
-        ],
+        max_output_tokens: req.maxTokens ?? 4096,
+        instructions: req.systemPrompt,
+        input: req.userPrompt,
       }),
       signal: req.signal,
     });

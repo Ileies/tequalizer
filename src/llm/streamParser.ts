@@ -1,18 +1,9 @@
 import type { TokenUsage } from './types.ts';
 
-interface Delta {
-  content?: string;
-}
-
-interface Choice {
-  delta: Delta;
-  finish_reason: string | null;
-}
-
-interface OpenAIChunk {
-  choices: Choice[];
-  usage?: { prompt_tokens: number; completion_tokens: number };
-}
+type ResponsesChunk =
+  | { type: 'response.output_text.delta'; delta: string }
+  | { type: 'response.completed'; response: { usage: { input_tokens: number; output_tokens: number } } }
+  | { type: string };
 
 export async function* parseSSEStream(
   stream: ReadableStream<Uint8Array>
@@ -29,7 +20,6 @@ export async function* parseSSEStream(
 
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
-      // Keep the last (possibly incomplete) line in the buffer
       buffer = lines.pop() ?? '';
 
       for (const line of lines) {
@@ -38,22 +28,19 @@ export async function* parseSSEStream(
         const data = trimmed.slice(6);
         if (data === '[DONE]') continue;
 
-        let chunk: OpenAIChunk;
+        let chunk: ResponsesChunk;
         try {
-          chunk = JSON.parse(data) as OpenAIChunk;
+          chunk = JSON.parse(data) as ResponsesChunk;
         } catch {
           continue;
         }
 
-        if (chunk.usage) {
-          usage = {
-            promptTokens: chunk.usage.prompt_tokens,
-            completionTokens: chunk.usage.completion_tokens,
-          };
+        if (chunk.type === 'response.output_text.delta') {
+          if (chunk.delta) yield chunk.delta;
+        } else if (chunk.type === 'response.completed') {
+          const u = chunk.response.usage;
+          usage = { promptTokens: u.input_tokens, completionTokens: u.output_tokens };
         }
-
-        const content = chunk.choices[0]?.delta?.content;
-        if (content) yield content;
       }
     }
   } finally {

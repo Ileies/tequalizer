@@ -26,7 +26,7 @@
     { key: 'formality', label: 'Formalität', min: 'Locker', max: 'Förmlich' },
   ];
 
-  const OPENAI_MODELS: Settings['openaiModel'][] = ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o', 'gpt-4o-mini'];
+  const OPENAI_MODELS: Settings['openaiModel'][] = ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o', 'gpt-4o-mini', 'gpt-5.4-mini'];
 
   let activeTab = $state<Tab>('api');
   let appState = $state<StoredState | null>(null);
