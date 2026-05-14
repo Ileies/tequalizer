@@ -1,5 +1,6 @@
 <script lang="ts">
   import { updateSettings } from '../../../src/storage/storageAdapter.ts';
+  import { sendMessage } from '../../../src/messaging/client.ts';
   import type { StoredState, Settings } from '../../../src/storage/schema.ts';
 
   const OPENAI_MODELS: Settings['openaiModel'][] = [
@@ -22,6 +23,10 @@
   let showClaudeKey = $state(false);
   let savedMsg = $state('');
   let savedTimer: ReturnType<typeof setTimeout> | null = null;
+  let validatingOpenai = $state(false);
+  let validatingClaude = $state(false);
+  let openaiKeyError = $state('');
+  let claudeKeyError = $state('');
 
   function showSaved() {
     savedMsg = 'Gespeichert ✓';
@@ -35,17 +40,49 @@
   }
 
   async function saveOpenaiKey(key: string) {
+    openaiKeyError = '';
     const apiKeys = $state.snapshot(appState.settings.apiKeys);
-    await updateSettings({ apiKeys: { ...apiKeys, openai: key } });
-    await onRefresh();
-    showSaved();
+    if (!key) {
+      await updateSettings({ apiKeys: { ...apiKeys, openai: '' } });
+      await onRefresh();
+      return;
+    }
+    validatingOpenai = true;
+    try {
+      const result = await sendMessage({ type: 'VALIDATE_API_KEY', payload: { provider: 'openai', key } });
+      if (!result.ok) {
+        openaiKeyError = result.error ?? 'Ungültiger API-Key.';
+        return;
+      }
+      await updateSettings({ apiKeys: { ...apiKeys, openai: key } });
+      await onRefresh();
+      showSaved();
+    } finally {
+      validatingOpenai = false;
+    }
   }
 
   async function saveClaudeKey(key: string) {
+    claudeKeyError = '';
     const apiKeys = $state.snapshot(appState.settings.apiKeys);
-    await updateSettings({ apiKeys: { ...apiKeys, claude: key } });
-    await onRefresh();
-    showSaved();
+    if (!key) {
+      await updateSettings({ apiKeys: { ...apiKeys, claude: '' } });
+      await onRefresh();
+      return;
+    }
+    validatingClaude = true;
+    try {
+      const result = await sendMessage({ type: 'VALIDATE_API_KEY', payload: { provider: 'claude', key } });
+      if (!result.ok) {
+        claudeKeyError = result.error ?? 'Ungültiger API-Key.';
+        return;
+      }
+      await updateSettings({ apiKeys: { ...apiKeys, claude: key } });
+      await onRefresh();
+      showSaved();
+    } finally {
+      validatingClaude = false;
+    }
   }
 
   async function saveOpenaiModel(model: Settings['openaiModel']) {
@@ -87,17 +124,23 @@
     <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted mb-3">OpenAI API-Key</div>
     <div class="flex gap-2 items-center">
       <input
-        class="input input-bordered w-full"
+        class="input input-bordered w-full {openaiKeyError ? 'input-error' : ''}"
         type={showOpenaiKey ? 'text' : 'password'}
         placeholder="sk-…"
         value={appState.settings.apiKeys.openai ?? ''}
         onchange={(e) => saveOpenaiKey(e.currentTarget.value)}
+        disabled={validatingOpenai}
       />
       <button
         class="btn btn-ghost btn-sm"
         onclick={() => (showOpenaiKey = !showOpenaiKey)}
       >{showOpenaiKey ? '🙈' : '👁'}</button>
     </div>
+    {#if validatingOpenai}
+      <div class="text-[13px] text-muted mt-2">Prüfe API-Key…</div>
+    {:else if openaiKeyError}
+      <div class="text-[13px] text-error mt-2">{openaiKeyError}</div>
+    {/if}
 
     <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted mb-3 mt-5">Modell</div>
     <select
@@ -120,17 +163,23 @@
     </div>
     <div class="flex gap-2 items-center">
       <input
-        class="input input-bordered w-full"
+        class="input input-bordered w-full {claudeKeyError ? 'input-error' : ''}"
         type={showClaudeKey ? 'text' : 'password'}
         placeholder="sk-ant-…"
         value={appState.settings.apiKeys.claude ?? ''}
         onchange={(e) => saveClaudeKey(e.currentTarget.value)}
+        disabled={validatingClaude}
       />
       <button
         class="btn btn-ghost btn-sm"
         onclick={() => (showClaudeKey = !showClaudeKey)}
       >{showClaudeKey ? '🙈' : '👁'}</button>
     </div>
+    {#if validatingClaude}
+      <div class="text-[13px] text-muted mt-2">Prüfe API-Key…</div>
+    {:else if claudeKeyError}
+      <div class="text-[13px] text-error mt-2">{claudeKeyError}</div>
+    {/if}
   </section>
 {/if}
 

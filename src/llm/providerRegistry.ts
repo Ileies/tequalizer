@@ -24,3 +24,7 @@ export function getActiveProvider(settings: Settings): LLMProvider {
 export function getAllProviders(): LLMProvider[] {
   return Object.values(PROVIDERS);
 }
+
+export function getProviderById(id: string): LLMProvider | undefined {
+  return PROVIDERS[id];
+}

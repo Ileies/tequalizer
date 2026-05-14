@@ -28,7 +28,22 @@ export type Message =
   | { type: 'TRIGGER_REWRITE'; payload: { styleId: string } }
   | { type: 'GET_PAGE_SAMPLES' }
   | { type: 'GET_SEGMENT_COUNT' }
-  | { type: 'EXTRACT_STYLE'; payload: { text: string } };
+  | { type: 'EXTRACT_STYLE'; payload: { text: string } }
+  | { type: 'VALIDATE_API_KEY'; payload: { provider: Settings['provider']; key: string } }
+  | {
+      type: 'CHUNK_REWRITE_REQUEST';
+      payload: {
+        segments: Array<{
+          text: string;
+          localIndex: number;
+          globalIndex: number;
+          totalSegments: number;
+        }>;
+        styleId: string;
+        requestId: string;
+      };
+    }
+  | { type: 'CHUNK_REWRITE_DONE'; payload: { requestId: string } };
 
 export type MessageType = Message['type'];
 
@@ -46,4 +61,6 @@ export type ResponseFor<T extends Message> = T extends { type: 'GET_SETTINGS' }
             ? { count: number }
             : T extends { type: 'EXTRACT_STYLE' }
             ? ExtractedStyle | { error: string }
+          : T extends { type: 'VALIDATE_API_KEY' }
+            ? { ok: boolean; error?: string }
             : void;
