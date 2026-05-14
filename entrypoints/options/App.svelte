@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getState } from '../../src/storage/storageAdapter.ts';
+  import { INITIAL_STATE } from '../../src/storage/schema.ts';
   import type { StoredState } from '../../src/storage/schema.ts';
   import ApiTab from './tabs/ApiTab.svelte';
   import StylesTab from './tabs/StylesTab.svelte';
@@ -24,6 +25,18 @@
 
   async function refresh() {
     appState = await getState();
+  }
+
+  let resetting = $state(false);
+
+  async function resetAllData() {
+    if (!confirm('Alle Daten löschen und auf Standardwerte zurücksetzen?')) return;
+    resetting = true;
+    await browser.storage.local.clear();
+    await browser.storage.local.set(INITIAL_STATE);
+    try { await browser.storage.session.clear(); } catch {}
+    appState = await getState();
+    resetting = false;
   }
 
   function handleTabKeydown(e: KeyboardEvent) {
@@ -64,6 +77,13 @@
             onkeydown={handleTabKeydown}
           >{label}</button>
         {/each}
+        <div class="mt-auto pt-6 border-t border-base-300">
+          <button
+            class="btn btn-ghost btn-sm w-full text-error/70 hover:text-error hover:bg-error/10"
+            onclick={resetAllData}
+            disabled={resetting}
+          >{resetting ? 'Wird zurückgesetzt…' : 'Daten zurücksetzen'}</button>
+        </div>
       </nav>
 
       <main
