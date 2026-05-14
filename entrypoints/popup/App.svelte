@@ -1,20 +1,11 @@
 <script lang="ts">
   import { getState, updateSettings } from '../../src/storage/storageAdapter.ts';
   import { saveStyle, createStyle } from '../../src/style-engine/library.ts';
+  import { DIMS } from '../../src/ui/dims.ts';
+  import ToggleSwitch from '../../src/ui/components/ToggleSwitch.svelte';
+  import ExtractPanel from './ExtractPanel.svelte';
   import type { StoredState, StyleConfig } from '../../src/storage/schema.ts';
   import type { ExtractedStyle } from '../../src/llm/styleExtractor.ts';
-  const DIMS: Array<{
-    key: keyof StyleConfig['dimensions'];
-    label: string;
-    min: string;
-    max: string;
-  }> = [
-    { key: 'length', label: 'Länge', min: 'Kürzer', max: 'Länger' },
-    { key: 'imagery', label: 'Bildlichkeit', min: 'Sachlich', max: 'Bildhaft' },
-    { key: 'warmth', label: 'Wärme', min: 'Kalt', max: 'Warm' },
-    { key: 'formality', label: 'Formalität', min: 'Locker', max: 'Förmlich' },
-    { key: 'simplicity', label: 'Einfachheit', min: 'Komplex', max: 'Einfach' },
-  ];
 
   let appState = $state<StoredState | null>(null);
   let triggering = $state(false);
@@ -23,9 +14,7 @@
   let extractError = $state<string | null>(null);
 
   $effect(() => {
-    getState().then((s) => {
-      appState = s;
-    });
+    getState().then((s) => { appState = s; });
   });
 
   const activeStyle = $derived(
@@ -34,39 +23,36 @@
       : null
   );
 
-  async function onStyleChange(id: string) {
-    if (!appState) return;
-    await updateSettings({ activeStyleId: id });
+  const extractActive = $derived(extracting || extractResult !== null || extractError !== null);
+
+  async function refresh() {
     appState = await getState();
   }
 
+  async function onStyleChange(id: string) {
+    await updateSettings({ activeStyleId: id });
+    await refresh();
+  }
+
   async function onDimChange(key: keyof StyleConfig['dimensions'], value: number) {
-    if (!appState || !activeStyle) return;
+    if (!activeStyle) return;
     const base = $state.snapshot(activeStyle) as StyleConfig;
-    const updated: StyleConfig = {
-      ...base,
-      dimensions: { ...base.dimensions, [key]: value },
-    };
-    await saveStyle(updated);
-    appState = await getState();
+    await saveStyle({ ...base, dimensions: { ...base.dimensions, [key]: value } });
+    await refresh();
   }
 
   async function toggleAutoRewrite() {
     if (!appState) return;
     const autoRewrite = $state.snapshot(appState.settings.autoRewrite);
-    await updateSettings({
-      autoRewrite: { ...autoRewrite, enabled: !autoRewrite.enabled },
-    });
-    appState = await getState();
+    await updateSettings({ autoRewrite: { ...autoRewrite, enabled: !autoRewrite.enabled } });
+    await refresh();
   }
 
   async function toggleKnowledge() {
     if (!appState) return;
     const knownKnowledge = $state.snapshot(appState.settings.knownKnowledge);
-    await updateSettings({
-      knownKnowledge: { ...knownKnowledge, enabled: !knownKnowledge.enabled },
-    });
-    appState = await getState();
+    await updateSettings({ knownKnowledge: { ...knownKnowledge, enabled: !knownKnowledge.enabled } });
+    await refresh();
   }
 
   async function triggerRewrite() {
@@ -90,7 +76,7 @@
   }
 
   async function extractStyle() {
-    if (!appState || extracting) return;
+    if (extracting) return;
     extracting = true;
     extractResult = null;
     extractError = null;
@@ -136,7 +122,7 @@
       dimensions: extractResult.dimensions,
       customInstructions: extractResult.customInstructions || base.customInstructions,
     });
-    appState = await getState();
+    await refresh();
     extractResult = null;
   }
 
@@ -152,7 +138,7 @@
     });
     await saveStyle(newStyle);
     await updateSettings({ activeStyleId: newStyle.id });
-    appState = await getState();
+    await refresh();
     extractResult = null;
   }
 
@@ -222,29 +208,25 @@
       <section class="px-4 py-3 border-b border-[#313244] flex flex-col gap-[10px]">
         <div class="flex items-center justify-between">
           <span class="text-sm text-[#cdd6f4]">Auto-Modus</span>
-          <button
-            class="relative w-10 h-[22px] rounded-[11px] cursor-pointer transition-colors duration-200 shrink-0 {appState.settings.autoRewrite.enabled ? 'bg-[#89b4fa]' : 'bg-[#313244]'}"
-            onclick={toggleAutoRewrite}
-            aria-pressed={appState.settings.autoRewrite.enabled}
-            aria-label="Auto-Modus"
-          >
-            <span class="absolute top-[3px] left-[3px] w-4 h-4 rounded-full bg-[#cdd6f4] transition-transform duration-200 pointer-events-none {appState.settings.autoRewrite.enabled ? 'translate-x-[18px]' : ''}"></span>
-          </button>
+          <ToggleSwitch
+            checked={appState.settings.autoRewrite.enabled}
+            label="Auto-Modus"
+            compact
+            onToggle={toggleAutoRewrite}
+          />
         </div>
         <div class="flex items-center justify-between">
           <span class="text-sm text-[#cdd6f4]">Bekanntes Wissen</span>
-          <button
-            class="relative w-10 h-[22px] rounded-[11px] cursor-pointer transition-colors duration-200 shrink-0 {appState.settings.knownKnowledge.enabled ? 'bg-[#89b4fa]' : 'bg-[#313244]'}"
-            onclick={toggleKnowledge}
-            aria-pressed={appState.settings.knownKnowledge.enabled}
-            aria-label="Bekanntes Wissen"
-          >
-            <span class="absolute top-[3px] left-[3px] w-4 h-4 rounded-full bg-[#cdd6f4] transition-transform duration-200 pointer-events-none {appState.settings.knownKnowledge.enabled ? 'translate-x-[18px]' : ''}"></span>
-          </button>
+          <ToggleSwitch
+            checked={appState.settings.knownKnowledge.enabled}
+            label="Bekanntes Wissen"
+            compact
+            onToggle={toggleKnowledge}
+          />
         </div>
       </section>
 
-      <section class="px-4 py-3 flex flex-col gap-2 {(extracting || extractResult !== null || extractError !== null) ? 'border-b border-[#313244]' : ''}">
+      <section class="px-4 py-3 flex flex-col gap-2 {extractActive ? 'border-b border-[#313244]' : ''}">
         <button
           class="block w-full text-center bg-[#89b4fa] text-[#1e1e2e] text-sm font-semibold py-[10px] rounded-[7px] cursor-pointer transition-colors duration-150 enabled:hover:bg-[#74c7ec] disabled:opacity-50 disabled:cursor-not-allowed"
           onclick={triggerRewrite}
@@ -261,46 +243,14 @@
         </button>
       </section>
 
-      {#if extracting || extractResult !== null || extractError !== null}
-        <section class="px-4 py-3">
-          {#if extracting}
-            <p class="text-[13px] text-[#6c7086] text-center">Stil wird analysiert…</p>
-          {:else if extractError}
-            <p class="text-[12px] text-[#f38ba8]">{extractError}</p>
-          {:else if extractResult}
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-[11px] font-semibold uppercase tracking-[0.07em] text-[#6c7086]">Extrahierter Stil</span>
-              <button
-                class="cursor-pointer text-base text-[#6c7086] leading-none px-1 rounded hover:text-[#cdd6f4]"
-                onclick={() => { extractResult = null; extractError = null; }}
-              >×</button>
-            </div>
-            <div class="grid grid-cols-2 gap-x-3 gap-y-1 mb-2">
-              {#each DIMS as dim}
-                <div class="flex items-center justify-between">
-                  <span class="text-[12px] text-[#9399b2]">{dim.label}</span>
-                  <span class="text-[12px] font-semibold tabular-nums {extractResult.dimensions[dim.key] > 0 ? 'text-[#89b4fa]' : extractResult.dimensions[dim.key] < 0 ? 'text-[#f38ba8]' : 'text-[#6c7086]'}">
-                    {extractResult.dimensions[dim.key] > 0 ? '+' : ''}{extractResult.dimensions[dim.key]}
-                  </span>
-                </div>
-              {/each}
-            </div>
-            {#if extractResult.customInstructions}
-              <p class="text-[11px] text-[#9399b2] italic leading-[1.4] mb-2">„{extractResult.customInstructions}"</p>
-            {/if}
-            <div class="flex gap-2">
-              <button
-                class="flex-1 text-center bg-[#313244] text-[#cdd6f4] text-[12px] font-medium py-[7px] rounded-md cursor-pointer transition-colors hover:bg-[#45475a]"
-                onclick={applyExtracted}
-              >Anwenden</button>
-              <button
-                class="flex-1 text-center bg-[#313244] text-[#cdd6f4] text-[12px] font-medium py-[7px] rounded-md cursor-pointer transition-colors hover:bg-[#45475a]"
-                onclick={saveExtractedAsNew}
-              >Als neuen Style</button>
-            </div>
-          {/if}
-        </section>
-      {/if}
+      <ExtractPanel
+        {extracting}
+        {extractResult}
+        {extractError}
+        onApply={applyExtracted}
+        onSaveAsNew={saveExtractedAsNew}
+        onDismiss={() => { extractResult = null; extractError = null; }}
+      />
     </div>
   {/if}
 </div>
