@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { buildPrompt } from '../../src/llm/promptBuilder.ts';
+import { buildPrompt, buildChunkPrompt } from '../../src/llm/promptBuilder.ts';
+import type { ChunkSegmentInfo } from '../../src/llm/promptBuilder.ts';
 import { INITIAL_STATE, DEFAULT_STYLE } from '../../src/storage/schema.ts';
 import type { StyleConfig } from '../../src/storage/schema.ts';
 
@@ -72,5 +73,38 @@ describe('buildPrompt', () => {
   it('produces deterministic output for same inputs (snapshot)', () => {
     const { systemPrompt } = buildPrompt(TEXT, DEFAULT_STYLE, BASE_SETTINGS);
     expect(systemPrompt).toMatchSnapshot();
+  });
+});
+
+describe('buildChunkPrompt', () => {
+  const makeSegs = (texts: string[]): ChunkSegmentInfo[] =>
+    texts.map((text, i) => ({ text, localIndex: i, globalIndex: i, totalSegments: texts.length }));
+
+  it('userPrompt contains correctly formed <<<S:N>>> markers', () => {
+    const segs = makeSegs(['Erster Absatz.', 'Zweiter Absatz.']);
+    const { userPrompt } = buildChunkPrompt(segs, DEFAULT_STYLE, BASE_SETTINGS);
+    expect(userPrompt).toContain('<<<S:0>>>');
+    expect(userPrompt).toContain('<<<S:1>>>');
+    expect(userPrompt).not.toContain('<<<S:0>>\n'); // two-bracket form must not appear
+  });
+
+  it('each segment text follows its marker on the next line', () => {
+    const segs = makeSegs(['Erster Absatz.', 'Zweiter Absatz.']);
+    const { userPrompt } = buildChunkPrompt(segs, DEFAULT_STYLE, BASE_SETTINGS);
+    expect(userPrompt).toContain('<<<S:0>>>\nErster Absatz.');
+    expect(userPrompt).toContain('<<<S:1>>>\nZweiter Absatz.');
+  });
+
+  it('systemPrompt contains format instructions and position info', () => {
+    const segs = makeSegs(['Text A', 'Text B', 'Text C']);
+    const { systemPrompt } = buildChunkPrompt(segs, DEFAULT_STYLE, BASE_SETTINGS);
+    expect(systemPrompt).toContain('Ausgabe-Format');
+    expect(systemPrompt).toContain('<<<S:0>>>');
+    expect(systemPrompt).toContain('Einleitung');
+  });
+
+  it('includes style dimension fragments', () => {
+    const { systemPrompt } = buildChunkPrompt(makeSegs(['Text']), DEFAULT_STYLE, BASE_SETTINGS);
+    expect(systemPrompt).toContain('Stilvorgaben:');
   });
 });
