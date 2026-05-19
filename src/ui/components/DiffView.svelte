@@ -1,6 +1,6 @@
 <script lang="ts">
   import { computeWordDiff } from '../../../entrypoints/content/diffRenderer.ts';
-  import type { FidelityReport } from '../../messaging/types.ts';
+  import type { FidelityReport } from '../../fidelity/checker.ts';
 
   let {
     original,

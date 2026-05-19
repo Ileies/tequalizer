@@ -1,5 +1,15 @@
-import type { FidelityIssue, FidelityReport } from '../messaging/types.ts';
 import { extractEntities } from './entityExtractor.ts';
+
+export interface FidelityIssue {
+  severity: 'high' | 'medium' | 'low';
+  type: 'invented_numbers' | 'dropped_quotes' | 'invented_names' | 'dropped_numbers';
+  detail: string[];
+}
+
+export interface FidelityReport {
+  issues: FidelityIssue[];
+  passed: boolean;
+}
 
 function normalizeNumber(n: string): string {
   return n.replace(/\s+/g, '').toLowerCase();

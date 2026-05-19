@@ -1,26 +1,9 @@
 import type { Settings, StyleConfig } from '../storage/schema.ts';
 import type { ExtractedStyle } from '../llm/styleExtractor.ts';
 
-export interface FidelityIssue {
-  severity: 'high' | 'medium' | 'low';
-  type: 'invented_numbers' | 'dropped_quotes' | 'invented_names' | 'dropped_numbers';
-  detail: string[];
-}
-
-export interface FidelityReport {
-  issues: FidelityIssue[];
-  passed: boolean;
-}
-
 export type Message =
-  | { type: 'REWRITE_REQUEST'; payload: { text: string; styleId: string; requestId: string } }
   | { type: 'REWRITE_TOKEN'; payload: { requestId: string; token: string } }
-  | {
-      type: 'REWRITE_DONE';
-      payload: { requestId: string; fullText: string; fidelity: FidelityReport };
-    }
   | { type: 'REWRITE_ERROR'; payload: { requestId: string; error: string } }
-  | { type: 'REWRITE_CANCEL'; payload: { requestId: string } }
   | { type: 'GET_SETTINGS' }
   | { type: 'UPDATE_SETTINGS'; payload: Partial<Settings> }
   | { type: 'SAVE_STYLE'; payload: StyleConfig }
