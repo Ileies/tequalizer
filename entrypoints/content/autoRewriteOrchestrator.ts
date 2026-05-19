@@ -4,8 +4,19 @@ import { showOriginals, showRewritten } from './domSurgeon.ts';
 
 const MAX_CONCURRENT = 3;
 
-export type SegmentRewriter = (
-  segment: Segment,
+// Maximum number of words bundled into a single LLM call.
+// Lower values → more parallel calls, less cross-paragraph coherence.
+// Higher values → fewer calls, better coherence, longer wait per chunk.
+export const CHUNK_WORD_BUDGET = 600;
+
+export interface ChunkInfo {
+  segments: Segment[];
+  globalIndices: number[];
+  totalSegments: number;
+}
+
+export type ChunkRewriter = (
+  chunk: ChunkInfo,
   requestId: string,
   styleId: string,
   signal: AbortSignal
@@ -17,10 +28,10 @@ export interface OrchestratorResult {
   stopped: boolean;
 }
 
-async function processWithConcurrency(
-  items: Segment[],
+async function processWithConcurrency<T>(
+  items: T[],
   concurrency: number,
-  task: (item: Segment) => Promise<void>,
+  task: (item: T) => Promise<void>,
   signal: AbortSignal
 ): Promise<void> {
   const executing = new Set<Promise<void>>();
@@ -39,6 +50,38 @@ function byVerticalPosition(a: Segment, b: Segment): number {
   const aTop = a.element.getBoundingClientRect().top + window.scrollY;
   const bTop = b.element.getBoundingClientRect().top + window.scrollY;
   return aTop - bTop;
+}
+
+function countWords(text: string): number {
+  return text.split(/\s+/).filter(Boolean).length;
+}
+
+function buildChunks(segments: Segment[]): Array<{ segments: Segment[]; globalIndices: number[] }> {
+  const chunks: Array<{ segments: Segment[]; globalIndices: number[] }> = [];
+  let current: Segment[] = [];
+  let currentIndices: number[] = [];
+  let wordCount = 0;
+
+  for (const [i, seg] of segments.entries()) {
+    const words = countWords(seg.text);
+
+    if (current.length > 0 && wordCount + words > CHUNK_WORD_BUDGET) {
+      chunks.push({ segments: current, globalIndices: currentIndices });
+      current = [];
+      currentIndices = [];
+      wordCount = 0;
+    }
+
+    current.push(seg);
+    currentIndices.push(i);
+    wordCount += words;
+  }
+
+  if (current.length > 0) {
+    chunks.push({ segments: current, globalIndices: currentIndices });
+  }
+
+  return chunks;
 }
 
 interface BannerElements {
@@ -128,7 +171,7 @@ function addStopButton(bannerEl: HTMLElement, controller: AbortController): void
 
 export async function runAutoRewrite(
   styleId: string,
-  rewriter: SegmentRewriter,
+  rewriter: ChunkRewriter,
   root: Element = document.body
 ): Promise<OrchestratorResult> {
   const segments = segmentDocument(root);
@@ -140,35 +183,42 @@ export async function runAutoRewrite(
     return { total: 0, rewritten: 0, stopped: false };
   }
 
+  const chunks = buildChunks(rewritable);
+  const totalSegments = rewritable.length;
+
   const controller = new AbortController();
   const banner = createBanner();
   addStopButton(banner.root, controller);
-  banner.updateText(0, rewritable.length);
+  banner.updateText(0, totalSegments);
   document.body.appendChild(banner.root);
 
   let rewritten = 0;
 
   await processWithConcurrency(
-    rewritable,
+    chunks,
     MAX_CONCURRENT,
-    async (segment) => {
+    async (chunk) => {
       if (controller.signal.aborted) return;
       const requestId = crypto.randomUUID();
       try {
-        await rewriter(segment, requestId, styleId, controller.signal);
-        rewritten++;
-        banner.updateText(rewritten, rewritable.length);
-      } catch {
-        // segment skipped on error — others continue
+        await rewriter(
+          { segments: chunk.segments, globalIndices: chunk.globalIndices, totalSegments },
+          requestId,
+          styleId,
+          controller.signal
+        );
+        rewritten += chunk.segments.length;
+        banner.updateText(rewritten, totalSegments);
+      } catch (e) {
+        console.error('[tequalizer] chunk failed:', e);
       }
     },
     controller.signal
   );
 
-  // Replace Stop button with toggle
   const stopBtn = banner.root.querySelector('button');
   stopBtn?.remove();
   banner.addToggle(root);
 
-  return { total: rewritable.length, rewritten, stopped: controller.signal.aborted };
+  return { total: totalSegments, rewritten, stopped: controller.signal.aborted };
 }

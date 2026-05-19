@@ -1,9 +1,8 @@
 import { getState, setState, updateSettings } from '../src/storage/storageAdapter.ts';
 import { getActiveProvider, getProviderById } from '../src/llm/providerRegistry.ts';
-import { buildPrompt, buildChunkPrompt } from '../src/llm/promptBuilder.ts';
+import { buildChunkPrompt } from '../src/llm/promptBuilder.ts';
 import type { ChunkSegmentInfo } from '../src/llm/promptBuilder.ts';
 import { buildExtractionPrompt, parseExtractedStyle } from '../src/llm/styleExtractor.ts';
-import { checkFidelity } from '../src/fidelity/checker.ts';
 import type { Message } from '../src/messaging/types.ts';
 
 export default defineBackground(() => {
@@ -127,57 +126,7 @@ async function handleRewritePort(port: RewritePort): Promise<void> {
 
   port.onMessage.addListener(
     async (msg: { type: string; payload: Record<string, unknown> }) => {
-      if (msg.type === 'REWRITE_REQUEST') {
-        const { text, styleId, requestId } = msg.payload as {
-          text: string;
-          styleId: string;
-          requestId: string;
-        };
-
-        try {
-          const state = await getState();
-          const style = state.styleLibrary.find((s) => s.id === styleId);
-          if (!style) {
-            port.postMessage({
-              type: 'REWRITE_ERROR',
-              payload: { requestId, error: 'Style nicht gefunden.' },
-            });
-            return;
-          }
-
-          const provider = getActiveProvider(state.settings);
-          const { systemPrompt, userPrompt } = buildPrompt(text, style, state.settings);
-
-          const gen = provider.streamRewrite({
-            text,
-            systemPrompt,
-            userPrompt,
-            signal: controller.signal,
-          });
-
-          let fullText = '';
-          let step = await gen.next();
-          while (!step.done) {
-            if (controller.signal.aborted) {
-              await gen.return({ fullText, usage: undefined });
-              return;
-            }
-            fullText += step.value;
-            port.postMessage({ type: 'REWRITE_TOKEN', payload: { requestId, token: step.value } });
-            step = await gen.next();
-          }
-
-          if (controller.signal.aborted) return;
-
-          const fidelity = checkFidelity(text, fullText);
-          port.postMessage({ type: 'REWRITE_DONE', payload: { requestId, fullText, fidelity } });
-        } catch (err) {
-          const error = err instanceof Error ? err.message : 'Unbekannter Fehler';
-          if (!controller.signal.aborted) {
-            port.postMessage({ type: 'REWRITE_ERROR', payload: { requestId, error } });
-          }
-        }
-      } else if (msg.type === 'CHUNK_REWRITE_REQUEST') {
+      if (msg.type === 'CHUNK_REWRITE_REQUEST') {
         const { segments, styleId, requestId } = msg.payload as {
           segments: ChunkSegmentInfo[];
           styleId: string;
