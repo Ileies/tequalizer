@@ -1,9 +1,13 @@
 import type { Segment } from './domSegmenter.ts';
 
 const CONTENT_THRESHOLD = 0.3;
+const MIN_WORDS_NONCONTENT = 10;
+
+// Elements whose text is always rewritten regardless of length.
+// All other elements require MIN_WORDS_NONCONTENT words to qualify.
+const CONTENT_TAGS = new Set(['p', 'li', 'blockquote', 'dt', 'dd', 'figcaption']);
 
 export type ClassificationReason =
-  | 'too_short'
   | 'too_few_words'
   | 'numeric_only'
   | 'chrome_region'
@@ -42,9 +46,10 @@ function computeContentScore(segment: Segment): number {
 }
 
 export function shouldRewrite(segment: Segment): ClassificationResult {
-  if (segment.text.length < 50) return { rewrite: false, reason: 'too_short' };
+  const isContent = CONTENT_TAGS.has(segment.element.tagName.toLowerCase());
+  const wordCount = segment.text.split(/\s+/).filter(Boolean).length;
 
-  if (segment.text.split(/\s+/).filter(Boolean).length < 10)
+  if (!isContent && wordCount < MIN_WORDS_NONCONTENT)
     return { rewrite: false, reason: 'too_few_words' };
 
   if (/^[\d\s.,€$%\-+/]+$/.test(segment.text))
@@ -70,8 +75,10 @@ export function shouldRewrite(segment: Segment): ClassificationResult {
   if (/©|all rights reserved|cookie|privacy policy/i.test(segment.text))
     return { rewrite: false, reason: 'boilerplate' };
 
-  const score = computeContentScore(segment);
-  if (score < CONTENT_THRESHOLD) return { rewrite: false, reason: 'low_content_score' };
+  if (!isContent) {
+    const score = computeContentScore(segment);
+    if (score < CONTENT_THRESHOLD) return { rewrite: false, reason: 'low_content_score' };
+  }
 
   return { rewrite: true, reason: 'content_segment' };
 }

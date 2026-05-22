@@ -7,7 +7,10 @@ export interface Segment {
   index: number;
 }
 
-const BLOCK_SELECTORS = 'p, li, blockquote, h1, h2, h3, h4, h5, h6, dt, dd, figcaption';
+const ALWAYS_CONTENT_SELECTORS = 'p, li, blockquote, dt, dd, figcaption';
+const CONDITIONAL_SELECTORS = 'button, caption, label, summary';
+const HEADING_SELECTORS = 'h1, h2, h3, h4, h5, h6';
+const BLOCK_SELECTORS = `${ALWAYS_CONTENT_SELECTORS}, ${CONDITIONAL_SELECTORS}, ${HEADING_SELECTORS}`;
 
 function getRole(element: Element): SegmentRole {
   const tag = element.tagName.toLowerCase();

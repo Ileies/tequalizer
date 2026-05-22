@@ -23,18 +23,19 @@ const GOOD_PROSE =
   'Ihre Prinzipien widersprechen oft der klassischen Vorstellung von Ursache und Wirkung.';
 
 describe('shouldRewrite', () => {
-  it('rejects text shorter than 50 chars', () => {
-    const seg = makeSegment('Kurzer Text hier.');
-    expect(shouldRewrite(seg)).toEqual({ rewrite: false, reason: 'too_short' });
+  it('approves short p element regardless of word count', () => {
+    const seg = makeSegment('Kurzer Satz.');
+    expect(shouldRewrite(seg)).toEqual({ rewrite: true, reason: 'content_segment' });
   });
 
-  it('rejects text with fewer than 10 words (>= 50 chars via long compound word)', () => {
-    // "Donaudampfschifffahrtsgesellschaft" fills the char requirement alone;
-    // the whole string has only 6 words — passes too_short, fails too_few_words
-    const seg = makeSegment(
-      'Donaudampfschifffahrtsgesellschaft, ihre Geschichte und Bedeutung insgesamt.'
-    );
+  it('rejects non-content element with fewer than 10 words', () => {
+    const seg = makeSegment('Donaudampfschifffahrtsgesellschaft, ihre Geschichte.', 'button');
     expect(shouldRewrite(seg)).toEqual({ rewrite: false, reason: 'too_few_words' });
+  });
+
+  it('approves non-content element once word threshold is reached', () => {
+    const seg = makeSegment(GOOD_PROSE, 'button');
+    expect(shouldRewrite(seg)).toEqual({ rewrite: true, reason: 'content_segment' });
   });
 
   it('rejects purely numeric text (>= 50 chars)', () => {
@@ -109,13 +110,20 @@ describe('shouldRewrite', () => {
     expect(shouldRewrite(seg)).toEqual({ rewrite: false, reason: 'boilerplate' });
   });
 
-  it('rejects text with low content score (no sentence-ending punctuation)', () => {
-    // >= 50 chars, >= 10 words, not numeric, not in special region, not heading, not link-dense,
-    // but no period/!/? → sentenceCount = 0 → score = 0 < CONTENT_THRESHOLD
+  it('rejects non-content element with low content score (no sentence-ending punctuation)', () => {
+    // Non-content element with >= 10 words but no sentence punctuation → low_content_score
+    const seg = makeSegment(
+      'Willkommen auf unserer Webseite mit vielen tollen Angeboten und Neuigkeiten aus aller Welt',
+      'button'
+    );
+    expect(shouldRewrite(seg)).toEqual({ rewrite: false, reason: 'low_content_score' });
+  });
+
+  it('approves p element with no sentence-ending punctuation (content element bypass)', () => {
     const seg = makeSegment(
       'Willkommen auf unserer Webseite mit vielen tollen Angeboten und Neuigkeiten aus aller Welt'
     );
-    expect(shouldRewrite(seg)).toEqual({ rewrite: false, reason: 'low_content_score' });
+    expect(shouldRewrite(seg)).toEqual({ rewrite: true, reason: 'content_segment' });
   });
 
   it('approves good prose paragraph', () => {
