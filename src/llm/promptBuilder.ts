@@ -6,7 +6,7 @@ const SYSTEM_RULES = `Du formulierst Texte um. Absolute Regeln, die NIE verletzt
 2. Entferne keine inhaltlichen Behauptungen des Originals, außer der Nutzer hat das explizit erlaubt.
 3. Behalte die logische Struktur und die Reihenfolge der Argumente bei.
 4. Antworte AUSSCHLIESSLICH mit dem umformulierten Text. Kein Vorspann, kein Nachspann, keine Erklärungen.
-5. Schreibe in modernem Deutsch, sofern die Stilanweisungen nichts anderes vorgeben. Keine archaischen oder veralteten Ausdrucksweisen als ungewollter Nebeneffekt von Formalität.`;
+5. Behalte die Sprache des Originaltexts bei. Übersetze nicht, außer die Stilanweisungen verlangen das explizit. Keine archaischen oder veralteten Ausdrucksweisen als ungewollter Nebeneffekt von Formalität.`;
 
 export interface BuiltPrompt {
   systemPrompt: string;
