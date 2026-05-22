@@ -87,7 +87,43 @@ function buildChunks(segments: Segment[]): Array<{ segments: Segment[]; globalIn
 interface BannerElements {
   root: HTMLElement;
   updateText: (done: number, total: number) => void;
+  addStopButton: (controller: AbortController) => void;
   addToggle: (root: Element) => void;
+}
+
+function createCollapseButton(
+  content: HTMLElement,
+  getLabel: () => string
+): HTMLButtonElement {
+  let collapsed = false;
+  const btn = document.createElement('button');
+  btn.textContent = '−';
+  btn.title = 'Ausblenden';
+  Object.assign(btn.style, {
+    background: 'transparent',
+    color: '#a6adc8',
+    border: 'none',
+    borderRadius: '4px',
+    padding: '0 4px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    lineHeight: '1',
+    flexShrink: '0',
+    marginLeft: 'auto',
+  });
+  btn.addEventListener('click', () => {
+    collapsed = !collapsed;
+    content.style.display = collapsed ? 'none' : 'contents';
+    btn.textContent = collapsed ? getLabel() : '−';
+    btn.title = collapsed ? 'Einblenden' : 'Ausblenden';
+    Object.assign(btn.style, {
+      fontSize: collapsed ? '12px' : '16px',
+      background: collapsed ? '#313244' : 'transparent',
+      padding: collapsed ? '2px 8px' : '0 4px',
+      color: collapsed ? '#cdd6f4' : '#a6adc8',
+    });
+  });
+  return btn;
 }
 
 function createBanner(): BannerElements {
@@ -111,14 +147,40 @@ function createBanner(): BannerElements {
     maxWidth: '400px',
   });
 
+  const content = document.createElement('span');
+  content.style.display = 'contents';
+
   const text = document.createElement('span');
   text.textContent = '0 von … Abschnitten umformuliert';
-  root.appendChild(text);
+  content.appendChild(text);
+  root.appendChild(content);
+
+  let currentLabel = '…';
+  const collapseBtn = createCollapseButton(content, () => currentLabel);
+  root.appendChild(collapseBtn);
 
   return {
     root,
     updateText(done, total) {
       text.textContent = `${done} von ${total} Abschnitten umformuliert`;
+      currentLabel = `${done}/${total}`;
+    },
+    addStopButton(controller: AbortController) {
+      const btn = document.createElement('button');
+      btn.textContent = 'Stop';
+      Object.assign(btn.style, {
+        background: '#f38ba8',
+        color: '#1e1e2e',
+        border: 'none',
+        borderRadius: '4px',
+        padding: '4px 10px',
+        cursor: 'pointer',
+        fontSize: '13px',
+        fontWeight: '600',
+        flexShrink: '0',
+      });
+      btn.addEventListener('click', () => controller.abort());
+      content.appendChild(btn);
     },
     addToggle(docRoot: Element) {
       let showingOriginal = false;
@@ -146,28 +208,11 @@ function createBanner(): BannerElements {
           btn.style.background = '#313244';
         }
       });
-      root.appendChild(btn);
+      content.appendChild(btn);
     },
   };
 }
 
-function addStopButton(bannerEl: HTMLElement, controller: AbortController): void {
-  const btn = document.createElement('button');
-  btn.textContent = 'Stop';
-  Object.assign(btn.style, {
-    background: '#f38ba8',
-    color: '#1e1e2e',
-    border: 'none',
-    borderRadius: '4px',
-    padding: '4px 10px',
-    cursor: 'pointer',
-    fontSize: '13px',
-    fontWeight: '600',
-    flexShrink: '0',
-  });
-  btn.addEventListener('click', () => controller.abort());
-  bannerEl.appendChild(btn);
-}
 
 export async function runAutoRewrite(
   styleId: string,
@@ -188,8 +233,8 @@ export async function runAutoRewrite(
 
   const controller = new AbortController();
   const banner = createBanner();
-  addStopButton(banner.root, controller);
   banner.updateText(0, totalSegments);
+  banner.addStopButton(controller);
   document.body.appendChild(banner.root);
 
   let rewritten = 0;
