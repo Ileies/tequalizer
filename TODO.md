@@ -8,8 +8,8 @@
 - [ ] **Claude/Ollama-Validierung reparieren** - Key-Validierung gibt `{ ok: true }` fuer Stub-Provider zurueck und verschleiert den Fehler; Provider entweder aus der UI entfernen oder mit klarem Hinweis deaktivieren ("kommt in V2/V3")
 - [ ] **Network-Timeout** - `openaiProvider.ts` Fetch-Calls haben kein Timeout; `AbortSignal.timeout()` hinzufuegen (10s)
 - [ ] **Onboarding** - First-Run-Modal das die fuenf Style-Slider erklaert und zeigt wie man startet
-- [ ] **API-Key-Validierung im Popup** - `saveKey()` in `popup/App.svelte` speichert Keys ohne Validierung; dieselbe Logik wie in `ApiTab.svelte` (`VALIDATE_API_KEY` Message) anwenden
-- [ ] **API-Key nach Speichern leeren** - nach erfolgreichem Speichern in `popup/App.svelte` den Input-Inhalt loeschen
+- [x] **API-Key-Validierung im Popup** - `saveKey()` in `popup/App.svelte` speichert Keys ohne Validierung; dieselbe Logik wie in `ApiTab.svelte` (`VALIDATE_API_KEY` Message) anwenden
+- [x] **API-Key nach Speichern leeren** - nach erfolgreichem Speichern in `popup/App.svelte` den Input-Inhalt loeschen
 
 ## Pre-launch: Store Submission
 
@@ -20,7 +20,7 @@
 
 ## UI
 
-- [ ] **Empty State Styles-Tab** - Style-Liste zeigt nichts wenn leer; leeren Zustand mit Call-to-Action anzeigen (`StylesTab.svelte`)
+- [x] **Empty State Styles-Tab** - Style-Liste zeigt nichts wenn leer; leeren Zustand mit Call-to-Action anzeigen (`StylesTab.svelte`)
 - [ ] **Ungespeicherte Aenderungen in KnowledgeTab** - kein Hinweis wenn der Profiltext geaendert aber noch nicht gespeichert wurde; Indicator anzeigen wenn `profileText !== savedText`
 - [ ] **Bestaetigung fuer "Verwerfen"** - der Verwerfen-Button im Popup hat keine Bestaetigung; Nutzer koennten versehentlich ausloefen
 - [ ] **Min-Word-Count Input** - negative Werte werden erst nach `onchange` korrigiert, sichtbar fuer den Nutzer; auf `oninput` umstellen (`AutoModeTab.svelte`)
@@ -31,8 +31,8 @@
 
 - [ ] **Slider-State Race Condition** - `liveValues` im Popup wird nicht zurueckgesetzt wenn der Nutzer den Style wechselt waehrend ein Slider gezogen wird; Style-Wechsel soll `liveValues` zuruecksetzen
 - [ ] **`window.close()` zu frueh** - in `triggerRewrite()` schliesst sich das Popup bevor die Message bestaetigt wurde; erst nach erfolgreicher Uebertragung schliessen
-- [ ] **Extraction-Button erneut klickbar** - waehrend Extraktionsergebnisse angezeigt werden kann "Stil extrahieren" nochmals geklickt werden; Button disabled halten waehrend Ergebnis sichtbar ist
-- [ ] **Keyboard-Support ToggleSwitch** - `Space`/`Enter` loesen den Toggle nicht aus; `onkeydown`-Handler in `ToggleSwitch.svelte` erganzen
+- [x] **Extraction-Button erneut klickbar** - waehrend Extraktionsergebnisse angezeigt werden kann "Stil extrahieren" nochmals geklickt werden; Button disabled halten waehrend Ergebnis sichtbar ist
+- [x] **Keyboard-Support ToggleSwitch** - `Space`/`Enter` loesen den Toggle nicht aus; `onkeydown`-Handler in `ToggleSwitch.svelte` erganzen
 
 ## DX
 
