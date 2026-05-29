@@ -2,6 +2,7 @@
   import { getState, updateSettings } from '../../src/storage/storageAdapter.ts';
   import { saveStyle, createStyle } from '../../src/style-engine/library.ts';
   import { DIMS } from '../../src/ui/dims.ts';
+  import { sendMessage } from '../../src/messaging/client.ts';
   import ExtractPanel from './ExtractPanel.svelte';
   import type { StoredState, StyleConfig, Settings } from '../../src/storage/schema.ts';
   import type { ExtractedStyle } from '../../src/llm/styleExtractor.ts';
@@ -18,6 +19,7 @@
   let showKey = $state(false);
   let keySaving = $state(false);
   let keySaved = $state(false);
+  let keyError = $state('');
 
   function isProviderConfigured(settings: Settings): boolean {
     if (settings.provider === 'openai') return Boolean(settings.apiKeys.openai);
@@ -39,15 +41,24 @@
   async function saveKey() {
     if (!appState || !keyInput.trim() || keySaving) return;
     keySaving = true;
+    keyError = '';
     const provider = appState.settings.provider;
-    const apiKeys = $state.snapshot(appState.settings.apiKeys);
-    await updateSettings({
-      apiKeys: { ...apiKeys, [provider]: keyInput.trim() },
-    });
-    appState = await getState();
-    keySaving = false;
-    keySaved = true;
-    setTimeout(() => { keySaved = false; }, 2000);
+    const key = keyInput.trim();
+    try {
+      const result = await sendMessage({ type: 'VALIDATE_API_KEY', payload: { provider, key } });
+      if (!result.ok) {
+        keyError = result.error ?? 'Ungültiger API-Key.';
+        return;
+      }
+      const apiKeys = $state.snapshot(appState.settings.apiKeys);
+      await updateSettings({ apiKeys: { ...apiKeys, [provider]: key } });
+      appState = await getState();
+      keyInput = '';
+      keySaved = true;
+      setTimeout(() => { keySaved = false; }, 2000);
+    } finally {
+      keySaving = false;
+    }
   }
 
   const SESSION_KEY = 'popup_pending';
@@ -304,12 +315,16 @@
             </div>
           </div>
 
+          {#if keyError}
+            <div class="text-[12px] text-error mt-1">{keyError}</div>
+          {/if}
+
           <button
             class="btn btn-primary w-full"
             onclick={saveKey}
             disabled={!keyInput.trim() || keySaving}
           >
-            {keySaving ? 'Speichern…' : keySaved ? 'Gespeichert ✓' : 'Speichern'}
+            {keySaving ? 'Prüfe Key…' : keySaved ? 'Gespeichert ✓' : 'Speichern'}
           </button>
         {/if}
 
@@ -424,7 +439,7 @@
         <button
           class="btn w-full bg-base-300 hover:bg-neutral text-base-content border-0"
           onclick={extractStyle}
-          disabled={extracting}
+          disabled={extractActive}
         >
           {extracting ? 'Analysiert…' : 'Stil extrahieren'}
         </button>
