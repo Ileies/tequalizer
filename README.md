@@ -132,7 +132,7 @@ bun run zip:firefox
 ```bash
 bun run test          # Vitest unit tests
 bun run test:e2e      # Playwright E2E tests (requires a build first)
-bun run typecheck     # svelte-check + tsc --noEmit
+bun run check         # svelte-check + tsc --noEmit
 bun run lint          # ESLint
 ```
 
@@ -177,43 +177,3 @@ Five sliders, integer −2 to +2:
 | Vitest | Unit tests |
 | Playwright | E2E tests |
 | Bun | Package manager and script runner |
-
-## Roadmap
-
-### Pre-launch (critical)
-
-- **Error feedback** - when a segment fails mid-stream (rate limit, network error), show a toast or inline banner instead of silently restoring the original text
-- **Manual rewrite progress** - popup currently closes after triggering a rewrite; show progress (running segments, done/failed count) so the user knows something is happening
-- **Auto-mode feedback** - show a subtle notification when auto-rewrite finishes ("Artikel umformuliert" / "Umformulierung fehlgeschlagen")
-- **Claude / Ollama clarity** - key validation currently returns `{ ok: true }` for stub providers, masking the "Not implemented" error; either remove them from the UI or disable them with a clear note ("kommt in V2/V3")
-- **Network timeout** - `openaiProvider` fetch calls have no timeout; add `AbortSignal.timeout()` so a hanging OpenAI request doesn't wait forever
-- **Onboarding** - first-run modal explaining the five style sliders and how to get started
-
-### Pre-launch (store submission)
-
-- **Privacy policy** - required for Chrome Web Store and Firefox Add-on submission
-- **Store assets** - screenshots, promotional images, store description
-- **Permissions justification** - document why `<all_urls>` is needed (required by both stores)
-- **Troubleshooting section in README** - "Why didn't my article rewrite?", known limitations
-
-### V2 - Claude provider
-
-- Implement `claudeProvider.ts`: Anthropic Messages API, SSE with `event:`-prefixed lines, `anthropic-version` header
-
-### V3 - Ollama provider
-
-- Implement `ollamaProvider.ts`: configurable endpoint (default `http://localhost:11434`), newline-delimited JSON (not SSE), extend `host_permissions` to include `http://localhost/*`
-
-### V4 - Style management
-
-- Per-site style pinning (e.g. always use Academic on Wikipedia)
-- Style import / export
-
-### Future
-
-- **Rewrite history / undo** - let users revert to the original after accepting a rewrite without a page reload
-- **Context menu rewrite** - right-click a paragraph to rewrite just that selection
-- **Dynamic model list** - fetch available models from the OpenAI API instead of a hardcoded list (list will rot)
-- **Diff view for auto-mode** - currently auto-mode applies rewrites silently; optionally show a diff before committing
-- **Expanded fidelity checking** - semantic similarity checks in addition to entity (number/date/name/quote) preservation
-- **Accessibility audit** - verify keyboard navigation and screen reader compatibility for all UI components
