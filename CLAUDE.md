@@ -140,9 +140,7 @@ Templates (`none`, `ted_talk`, `bible`, `personal_letter`, `academic`, `tabloid`
 
 ## Roadmap context
 
-- **V2** - Implement `claudeProvider.ts`: Anthropic Messages API, SSE with `event:`-prefixed lines, `anthropic-version` header.
-- **V3** - Implement `ollamaProvider.ts`: configurable endpoint (default `http://localhost:11434`), newline-delimited JSON (not SSE), extend `host_permissions` to include `http://localhost/*`.
-- **V4** - Per-site style pinning, style import/export.
+See `TODO.md`.
 
 ## Testing
 
