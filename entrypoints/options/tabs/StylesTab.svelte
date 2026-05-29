@@ -61,6 +61,16 @@
 </div>
 
 <div class="flex flex-col gap-3">
+  {#if appState.styleLibrary.filter(s => !s.builtIn).length === 0}
+    <div class="bg-base-200 border border-dashed border-base-300 rounded-xl px-[22px] py-10 flex flex-col items-center gap-3 text-center">
+      <p class="text-[15px] text-muted">Noch keine eigenen Styles</p>
+      <p class="text-[13px] text-subtext leading-snug max-w-[260px]">Erstelle einen neuen Style oder extrahiere einen Stil aus einer Webseite.</p>
+      <button
+        class="btn btn-primary btn-sm mt-1"
+        onclick={openNewStyle}
+      >+ Neuer Style</button>
+    </div>
+  {/if}
   {#each appState.styleLibrary as style}
     <div class="bg-base-200 border border-base-300 rounded-xl px-[22px] py-[18px] flex items-center justify-between gap-4">
       <div class="flex flex-col gap-2 min-w-0">

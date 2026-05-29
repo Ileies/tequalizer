@@ -15,6 +15,7 @@
 <button
   class="relative cursor-pointer transition-colors duration-200 shrink-0 {compact ? 'w-10 h-[22px] rounded-[11px]' : 'w-11 h-6 rounded-xl'} {checked ? 'bg-[#89b4fa]' : 'bg-[#313244]'}"
   onclick={onToggle}
+  onkeydown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); onToggle(); } }}
   aria-pressed={checked}
   aria-label={label}
 >
