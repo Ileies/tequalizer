@@ -4,7 +4,7 @@ import { PRESET_STYLES, DEFAULT_STYLE, DEFAULT_STYLE_ID } from './schema.ts';
 type Migration = (state: Record<string, unknown>) => Record<string, unknown>;
 
 const MIGRATIONS: Record<number, Migration> = {
-  // v1 is the initial schema — no migration needed
+  // v1 is the initial schema - no migration needed
   2: (state) => {
     const library = Array.isArray(state['styleLibrary']) ? state['styleLibrary'] : [];
     const DIM_KEYS = ['length', 'imagery', 'warmth', 'formality', 'simplicity'];

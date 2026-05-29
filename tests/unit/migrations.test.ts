@@ -7,7 +7,7 @@ describe('migrate', () => {
     expect(result['schemaVersion']).toBe(CURRENT_SCHEMA_VERSION);
   });
 
-  it('is idempotent — migrating an already-current state changes nothing', () => {
+  it('is idempotent - migrating an already-current state changes nothing', () => {
     const state = { settings: {}, styleLibrary: [], schemaVersion: CURRENT_SCHEMA_VERSION };
     const result = migrate(state);
     expect(result['schemaVersion']).toBe(CURRENT_SCHEMA_VERSION);

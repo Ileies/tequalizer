@@ -1,19 +1,19 @@
-# Tequalizer — Texte in deinem Stil
+# Tequalizer - Texte in deinem Stil
 
 A cross-browser extension (Chrome MV3 + Firefox MV3) that rewrites articles and blog posts on any website to match your personal writing style preferences.
 
 ## Features
 
-- **Style dimensions** — five sliders (length, imagery, warmth, formality, simplicity), integer −2 to +2
-- **Templates** — TED Talk, Bible, Personal Letter, Academic, Tabloid
-- **Style library** — save and switch between multiple named styles
-- **Style extraction** — analyze the writing style of any page and import it as a new style
-- **Auto-mode** — automatically detects and rewrites articles on page load
-- **Manual trigger** — rewrite the current page from the popup at any time
-- **Diff view** — side-by-side original vs. rewrite with word-level highlighting; accept or reject
-- **Known knowledge** — optional user profile injected into the prompt so the LLM skips obvious context
-- **API key setup** — popup shows an inline key entry screen when no key is configured
-- **Provider abstraction** — OpenAI in V1, architecture ready for Claude (V2) and Ollama (V3)
+- **Style dimensions** - five sliders (length, imagery, warmth, formality, simplicity), integer −2 to +2
+- **Templates** - TED Talk, Bible, Personal Letter, Academic, Tabloid
+- **Style library** - save and switch between multiple named styles
+- **Style extraction** - analyze the writing style of any page and import it as a new style
+- **Auto-mode** - automatically detects and rewrites articles on page load
+- **Manual trigger** - rewrite the current page from the popup at any time
+- **Diff view** - side-by-side original vs. rewrite with word-level highlighting; accept or reject
+- **Known knowledge** - optional user profile injected into the prompt so the LLM skips obvious context
+- **API key setup** - popup shows an inline key entry screen when no key is configured
+- **Provider abstraction** - OpenAI in V1, architecture ready for Claude (V2) and Ollama (V3)
 
 ## Architecture
 
@@ -45,54 +45,54 @@ A cross-browser extension (Chrome MV3 + Firefox MV3) that rewrites articles and 
 
 ```
 entrypoints/
-  background.ts          — service worker; LLM streaming, port-based messaging, style extraction
+  background.ts          - service worker; LLM streaming, port-based messaging, style extraction
   content/
-    index.ts             — message listeners (TRIGGER_REWRITE, GET_PAGE_SAMPLES), auto-rewrite trigger
-    articleDetector.ts   — Readability-based page scoring
-    autoRewriteOrchestrator.ts — segment iteration, streaming coordination
-    diffRenderer.ts      — word-level diff rendering
-    diffViewInjector.ts  — injects the DiffView overlay into the page
-    domSegmenter.ts      — splits article DOM into rewritable segments
-    domSurgeon.ts        — applies accepted rewrites back to the DOM
-    segmentClassifier.ts — filters out headings, nav, code, link-dense text
+    index.ts             - message listeners (TRIGGER_REWRITE, GET_PAGE_SAMPLES), auto-rewrite trigger
+    articleDetector.ts   - Readability-based page scoring
+    autoRewriteOrchestrator.ts - segment iteration, streaming coordination
+    diffRenderer.ts      - word-level diff rendering
+    diffViewInjector.ts  - injects the DiffView overlay into the page
+    domSegmenter.ts      - splits article DOM into rewritable segments
+    domSurgeon.ts        - applies accepted rewrites back to the DOM
+    segmentClassifier.ts - filters out headings, nav, code, link-dense text
   popup/
-    App.svelte           — style picker, dimension sliders, toggles, trigger + extract buttons
-    ExtractPanel.svelte  — shows extracted style with apply / save-as-new actions
+    App.svelte           - style picker, dimension sliders, toggles, trigger + extract buttons
+    ExtractPanel.svelte  - shows extracted style with apply / save-as-new actions
   options/
-    App.svelte           — 4-tab settings page with vertical sidebar nav
-    StyleEditorDialog.svelte — modal for creating/editing styles
+    App.svelte           - 4-tab settings page with vertical sidebar nav
+    StyleEditorDialog.svelte - modal for creating/editing styles
     tabs/
-      ApiTab.svelte      — provider selection, API keys, model picker
-      StylesTab.svelte   — style library list (create, edit, delete, set default)
-      AutoModeTab.svelte — enable/disable, min-word-count, domain exclusions
-      KnowledgeTab.svelte — user profile text
+      ApiTab.svelte      - provider selection, API keys, model picker
+      StylesTab.svelte   - style library list (create, edit, delete, set default)
+      AutoModeTab.svelte - enable/disable, min-word-count, domain exclusions
+      KnowledgeTab.svelte - user profile text
 
 src/
   fidelity/
-    checker.ts           — post-rewrite fidelity check (entity preservation)
-    entityExtractor.ts   — regex-based number/date/name/quote extraction
+    checker.ts           - post-rewrite fidelity check (entity preservation)
+    entityExtractor.ts   - regex-based number/date/name/quote extraction
   llm/
-    promptBuilder.ts     — assembles system + user prompt from style + settings
-    streamParser.ts      — SSE → token stream parser
-    styleExtractor.ts    — LLM prompt + response parser for style extraction
-    openaiProvider.ts    — OpenAI chat completions (streaming)
-    claudeProvider.ts    — stub (V2)
-    ollamaProvider.ts    — stub (V3)
-    providerRegistry.ts  — selects the active provider from settings
+    promptBuilder.ts     - assembles system + user prompt from style + settings
+    streamParser.ts      - SSE → token stream parser
+    styleExtractor.ts    - LLM prompt + response parser for style extraction
+    openaiProvider.ts    - OpenAI chat completions (streaming)
+    claudeProvider.ts    - stub (V2)
+    ollamaProvider.ts    - stub (V3)
+    providerRegistry.ts  - selects the active provider from settings
   messaging/
-    types.ts             — discriminated union of all extension messages
-    client.ts            — sendMessage / openPort helpers for extension pages
+    types.ts             - discriminated union of all extension messages
+    client.ts            - sendMessage / openPort helpers for extension pages
   storage/
-    schema.ts            — Zod schemas: StyleConfig (5 dims, −2…+2), Settings, StoredState
-    storageAdapter.ts    — getState / setState / updateSettings + subscribers
-    migrations.ts        — schema version migrations (v3)
+    schema.ts            - Zod schemas: StyleConfig (5 dims, −2…+2), Settings, StoredState
+    storageAdapter.ts    - getState / setState / updateSettings + subscribers
+    migrations.ts        - schema version migrations (v3)
   style-engine/
-    dimensions.ts        — maps integer values (−2…+2) to German prompt fragments
-    presets.ts           — few-shot examples for each template
-    library.ts           — CRUD for the style library (saveStyle, deleteStyle, createStyle)
+    dimensions.ts        - maps integer values (−2…+2) to German prompt fragments
+    presets.ts           - few-shot examples for each template
+    library.ts           - CRUD for the style library (saveStyle, deleteStyle, createStyle)
   ui/
-    dims.ts              — DIMS array shared between popup and options for slider rendering
-    app.css              — Tailwind + DaisyUI theme
+    dims.ts              - DIMS array shared between popup and options for slider rendering
+    app.css              - Tailwind + DaisyUI theme
     components/
       DiffView.svelte
       ToggleSwitch.svelte
@@ -180,6 +180,40 @@ Five sliders, integer −2 to +2:
 
 ## Roadmap
 
-- **V2** — Claude (Anthropic) provider
-- **V3** — Ollama (local) provider
-- **V4** — Per-site style pinning; style import/export
+### Pre-launch (critical)
+
+- **Error feedback** - when a segment fails mid-stream (rate limit, network error), show a toast or inline banner instead of silently restoring the original text
+- **Manual rewrite progress** - popup currently closes after triggering a rewrite; show progress (running segments, done/failed count) so the user knows something is happening
+- **Auto-mode feedback** - show a subtle notification when auto-rewrite finishes ("Artikel umformuliert" / "Umformulierung fehlgeschlagen")
+- **Claude / Ollama clarity** - key validation currently returns `{ ok: true }` for stub providers, masking the "Not implemented" error; either remove them from the UI or disable them with a clear note ("kommt in V2/V3")
+- **Network timeout** - `openaiProvider` fetch calls have no timeout; add `AbortSignal.timeout()` so a hanging OpenAI request doesn't wait forever
+- **Onboarding** - first-run modal explaining the five style sliders and how to get started
+
+### Pre-launch (store submission)
+
+- **Privacy policy** - required for Chrome Web Store and Firefox Add-on submission
+- **Store assets** - screenshots, promotional images, store description
+- **Permissions justification** - document why `<all_urls>` is needed (required by both stores)
+- **Troubleshooting section in README** - "Why didn't my article rewrite?", known limitations
+
+### V2 - Claude provider
+
+- Implement `claudeProvider.ts`: Anthropic Messages API, SSE with `event:`-prefixed lines, `anthropic-version` header
+
+### V3 - Ollama provider
+
+- Implement `ollamaProvider.ts`: configurable endpoint (default `http://localhost:11434`), newline-delimited JSON (not SSE), extend `host_permissions` to include `http://localhost/*`
+
+### V4 - Style management
+
+- Per-site style pinning (e.g. always use Academic on Wikipedia)
+- Style import / export
+
+### Future
+
+- **Rewrite history / undo** - let users revert to the original after accepting a rewrite without a page reload
+- **Context menu rewrite** - right-click a paragraph to rewrite just that selection
+- **Dynamic model list** - fetch available models from the OpenAI API instead of a hardcoded list (list will rot)
+- **Diff view for auto-mode** - currently auto-mode applies rewrites silently; optionally show a diff before committing
+- **Expanded fidelity checking** - semantic similarity checks in addition to entity (number/date/name/quote) preservation
+- **Accessibility audit** - verify keyboard navigation and screen reader compatibility for all UI components

@@ -10,10 +10,10 @@ export const ollamaProvider: LLMProvider = {
   },
 
   async validateCredentials(_settings: Settings): Promise<{ ok: boolean; error?: string }> {
-    throw new Error('Not implemented in V1 — see roadmap (V3)');
+    throw new Error('Not implemented in V1 - see roadmap (V3)');
   },
 
   async *streamRewrite(_req: RewriteRequest): AsyncGenerator<string, StreamResult, void> {
-    throw new Error('Not implemented in V1 — see roadmap (V3)');
+    throw new Error('Not implemented in V1 - see roadmap (V3)');
   },
 };

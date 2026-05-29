@@ -62,7 +62,7 @@ test('nav, header, footer and aside elements are never marked data-rewritten', a
   const page = await context.newPage();
   await page.goto(ARTICLE_URL);
 
-  // Banner appears before any LLM call — wait for it
+  // Banner appears before any LLM call - wait for it
   await expect(page.locator('[data-rewrite-banner]')).toBeAttached({ timeout: 8000 });
   // Allow all segment attempts to finish (fail immediately without API key)
   await page.waitForTimeout(1000);

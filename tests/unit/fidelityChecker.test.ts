@@ -32,7 +32,7 @@ describe('extractEntities', () => {
 
   it('does not extract articles as part of a name', () => {
     const { names } = extractEntities('Die Bundeskanzlerin trat zurück.');
-    // "Die Bundeskanzlerin" should be skipped — "Die" is in SKIP_FIRST_WORDS
+    // "Die Bundeskanzlerin" should be skipped - "Die" is in SKIP_FIRST_WORDS
     expect(names).not.toContain('Die Bundeskanzlerin');
   });
 
@@ -86,7 +86,7 @@ describe('checkFidelity', () => {
     const droppedIssue = report.issues.find((i) => i.type === 'dropped_numbers');
     expect(droppedIssue).toBeDefined();
     expect(droppedIssue?.severity).toBe('medium');
-    // Only medium severity — should still pass (no high issues)
+    // Only medium severity - should still pass (no high issues)
     expect(report.passed).toBe(true);
   });
 
@@ -107,7 +107,7 @@ describe('checkFidelity', () => {
     const original = 'Der Anteil beträgt 42%.';
     const rewritten = 'Der Anteil liegt bei 42 %.';
     const report = checkFidelity(original, rewritten);
-    // Same number, different formatting — should not flag invented_numbers
+    // Same number, different formatting - should not flag invented_numbers
     const inventedIssue = report.issues.find((i) => i.type === 'invented_numbers');
     expect(inventedIssue).toBeUndefined();
   });

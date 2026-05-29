@@ -56,7 +56,7 @@
 
 <section class="bg-base-200 border border-base-300 rounded-xl px-7 py-6 mb-5">
   <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted mb-3">Profil-Text</div>
-  <div class="text-[13px] text-muted mb-[14px] leading-[1.55]">Beschreibe, wie Artikel umgeschrieben werden sollen — z. B. gewünschter Ton, Komplexität oder thematische Schwerpunkte.</div>
+  <div class="text-[13px] text-muted mb-[14px] leading-[1.55]">Beschreibe, wie Artikel umgeschrieben werden sollen - z. B. gewünschter Ton, Komplexität oder thematische Schwerpunkte.</div>
   <textarea
     class="textarea textarea-bordered w-full text-sm resize-y leading-[1.6]"
     rows="10"

@@ -5,18 +5,18 @@ export interface Entities {
   quotes: string[];
 }
 
-// Matches dates like 1.1.2024 or 01.01.24 — extracted before numbers to avoid overlap
+// Matches dates like 1.1.2024 or 01.01.24 - extracted before numbers to avoid overlap
 const DATE_RE = /\b\d{1,2}\.\d{1,2}\.\d{2,4}\b/g;
 // Standalone 4-digit years (1000–2999)
 const YEAR_RE = /\b[12]\d{3}\b/g;
 
 // Numbers with optional decimal/thousands separator and common units.
-// No trailing \b — unit symbols like % and € are non-word chars, which break \b.
+// No trailing \b - unit symbols like % and € are non-word chars, which break \b.
 // Leading \b prevents matching digits inside words.
 const NUMBER_RE =
   /\b\d+(?:[.,]\d+)*\s*(?:%|€|\$|£|km|kg|g|t|mio\.?|mrd\.?|Millionen|Milliarden|Prozent|Mio\.?|Mrd\.?)?/gi;
 
-// German quotes „…" and English "…" — capture the inner content
+// German quotes „…" and English "…" - capture the inner content
 const QUOTE_DE_RE = /„([^"]+)"/g;
 const QUOTE_EN_RE = /"([^"]{2,})"/g;
 
