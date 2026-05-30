@@ -25,6 +25,7 @@ export type ChunkRewriter = (
 export interface OrchestratorResult {
   total: number;
   rewritten: number;
+  failed: number;
   stopped: boolean;
 }
 
@@ -87,6 +88,7 @@ function buildChunks(segments: Segment[]): Array<{ segments: Segment[]; globalIn
 interface BannerElements {
   root: HTMLElement;
   updateText: (done: number, total: number) => void;
+  reportError: (failed: number) => void;
   addStopButton: (controller: AbortController) => void;
   addToggle: (root: Element) => void;
 }
@@ -153,9 +155,15 @@ function createBanner(): BannerElements {
   const text = document.createElement('span');
   text.textContent = '0 von … Abschnitten umformuliert';
   content.appendChild(text);
+
+  const errorText = document.createElement('span');
+  errorText.style.cssText = 'display:none; color:#f38ba8; flex-shrink:0';
+  content.appendChild(errorText);
+
   root.appendChild(content);
 
   let currentLabel = '…';
+  let failedCount = 0;
   const collapseBtn = createCollapseButton(content, () => currentLabel);
   root.appendChild(collapseBtn);
 
@@ -163,7 +171,12 @@ function createBanner(): BannerElements {
     root,
     updateText(done, total) {
       text.textContent = `${done} von ${total} Abschnitten umformuliert`;
-      currentLabel = `${done}/${total}`;
+      currentLabel = failedCount > 0 ? `${done}/${total} · ${failedCount}✗` : `${done}/${total}`;
+    },
+    reportError(failed) {
+      failedCount = failed;
+      errorText.style.display = failed > 0 ? '' : 'none';
+      errorText.textContent = `· ${failed} fehlgeschlagen`;
     },
     addStopButton(controller: AbortController) {
       const btn = document.createElement('button');
@@ -225,7 +238,7 @@ export async function runAutoRewrite(
     .sort(byVerticalPosition);
 
   if (rewritable.length === 0) {
-    return { total: 0, rewritten: 0, stopped: false };
+    return { total: 0, rewritten: 0, failed: 0, stopped: false };
   }
 
   const chunks = buildChunks(rewritable);
@@ -238,6 +251,7 @@ export async function runAutoRewrite(
   document.body.appendChild(banner.root);
 
   let rewritten = 0;
+  let failed = 0;
 
   await processWithConcurrency(
     chunks,
@@ -255,6 +269,9 @@ export async function runAutoRewrite(
         rewritten += chunk.segments.length;
         banner.updateText(rewritten, totalSegments);
       } catch (e) {
+        failed += chunk.segments.length;
+        banner.reportError(failed);
+        banner.updateText(rewritten, totalSegments);
         console.error('[tequalizer] chunk failed:', e);
       }
     },
@@ -265,5 +282,5 @@ export async function runAutoRewrite(
   stopBtn?.remove();
   banner.addToggle(root);
 
-  return { total: totalSegments, rewritten, stopped: controller.signal.aborted };
+  return { total: totalSegments, rewritten, failed, stopped: controller.signal.aborted };
 }
