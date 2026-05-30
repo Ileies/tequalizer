@@ -26,7 +26,8 @@ export type Message =
         requestId: string;
       };
     }
-  | { type: 'CHUNK_REWRITE_DONE'; payload: { requestId: string } };
+  | { type: 'CHUNK_REWRITE_DONE'; payload: { requestId: string } }
+  | { type: 'GET_REWRITE_PROGRESS' };
 
 export type MessageType = Message['type'];
 
@@ -46,4 +47,6 @@ export type ResponseFor<T extends Message> = T extends { type: 'GET_SETTINGS' }
             ? ExtractedStyle | { error: string }
           : T extends { type: 'VALIDATE_API_KEY' }
             ? { ok: boolean; error?: string }
-            : void;
+            : T extends { type: 'GET_REWRITE_PROGRESS' }
+              ? { total: number; done: number; failed: number; running: boolean } | null
+              : void;
