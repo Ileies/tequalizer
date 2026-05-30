@@ -3,7 +3,7 @@
 ## Pre-launch: Kritische Fixes
 
 - [x] **Error-Feedback bei Segment-Fehler** - wenn ein Absatz nicht umformuliert wird (Rate-Limit, Netzwerkfehler), Toast oder Banner zeigen statt still den Original-Text wiederherstellen (`autoRewriteOrchestrator.ts` Fehler in die UI propagieren)
-- [ ] **Fortschrittsanzeige beim manuellen Rewrite** - Popup schliesst sich aktuell nach dem Trigger ohne Feedback; laufende Segmente, Done/Failed-Zaehler anzeigen
+- [x] **Fortschrittsanzeige beim manuellen Rewrite** - Popup schliesst sich aktuell nach dem Trigger ohne Feedback; laufende Segmente, Done/Failed-Zaehler anzeigen
 - [ ] **Auto-Mode-Feedback** - kurze Benachrichtigung wenn Auto-Rewrite abgeschlossen ist ("Artikel umformuliert" / "Umformulierung fehlgeschlagen")
 - [ ] **Claude/Ollama-Validierung reparieren** - Key-Validierung gibt `{ ok: true }` fuer Stub-Provider zurueck und verschleiert den Fehler; Provider mit klarem Hinweis deaktivieren ("kommt in V2/V3")
 - [ ] **Network-Timeout** - `openaiProvider.ts` Fetch-Calls haben kein Timeout; `AbortSignal.timeout()` hinzufuegen (10s)
@@ -30,7 +30,7 @@
 ## UX
 
 - [ ] **Slider-State Race Condition** - `liveValues` im Popup wird nicht zurueckgesetzt wenn der Nutzer den Style wechselt waehrend ein Slider gezogen wird; Style-Wechsel soll `liveValues` zuruecksetzen
-- [ ] **`window.close()` zu frueh** - in `triggerRewrite()` schliesst sich das Popup bevor die Message bestaetigt wurde; erst nach erfolgreicher Uebertragung schliessen
+- [x] **`window.close()` zu frueh** - in `triggerRewrite()` schliesst sich das Popup bevor die Message bestaetigt wurde; erst nach erfolgreicher Uebertragung schliessen
 - [x] **Extraction-Button erneut klickbar** - waehrend Extraktionsergebnisse angezeigt werden kann "Stil extrahieren" nochmals geklickt werden; Button disabled halten waehrend Ergebnis sichtbar ist
 - [x] **Keyboard-Support ToggleSwitch** - `Space`/`Enter` loesen den Toggle nicht aus; `onkeydown`-Handler in `ToggleSwitch.svelte` erganzen
 

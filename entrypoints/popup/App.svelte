@@ -20,6 +20,10 @@
   let keySaving = $state(false);
   let keySaved = $state(false);
   let keyError = $state('');
+  let rewriteRunning = $state(false);
+  let rewriteProgress = $state<{ total: number; done: number; failed: number; running: boolean } | null>(null);
+  let progressTabId: number | null = null;
+  let progressInterval: ReturnType<typeof setInterval> | null = null;
 
   function isProviderConfigured(settings: Settings): boolean {
     if (settings.provider === 'openai') return Boolean(settings.apiKeys.openai);
@@ -103,11 +107,22 @@
     browser.tabs.query({ active: true, currentWindow: true }).then(async (tabs) => {
       const tabId = tabs[0]?.id;
       if (tabId == null) return;
+      progressTabId = tabId;
       try {
-        const result = (await browser.tabs.sendMessage(tabId, { type: 'GET_SEGMENT_COUNT' })) as { count: number } | null;
-        if (result) segmentCount = result.count;
+        const countResult = (await browser.tabs.sendMessage(tabId, { type: 'GET_SEGMENT_COUNT' })) as { count: number } | null;
+        if (countResult) segmentCount = countResult.count;
       } catch {
         // Content script not injected on this page
+      }
+      try {
+        const progress = (await browser.tabs.sendMessage(tabId, { type: 'GET_REWRITE_PROGRESS' })) as { total: number; done: number; failed: number; running: boolean } | null;
+        if (progress?.running) {
+          rewriteProgress = progress;
+          rewriteRunning = true;
+          startProgressPolling();
+        }
+      } catch {
+        // Content script not injected
       }
     });
   });
@@ -168,8 +183,38 @@
     await refresh();
   }
 
+  function startProgressPolling() {
+    if (progressInterval != null) return;
+    progressInterval = setInterval(async () => {
+      if (progressTabId == null) {
+        stopProgressPolling();
+        return;
+      }
+      try {
+        const result = (await browser.tabs.sendMessage(progressTabId, { type: 'GET_REWRITE_PROGRESS' })) as { total: number; done: number; failed: number; running: boolean } | null;
+        if (result != null) {
+          rewriteProgress = result;
+          if (!result.running) stopProgressPolling();
+        } else {
+          rewriteProgress = rewriteProgress ? { ...rewriteProgress, running: false } : null;
+          stopProgressPolling();
+        }
+      } catch {
+        rewriteProgress = rewriteProgress ? { ...rewriteProgress, running: false } : null;
+        stopProgressPolling();
+      }
+    }, 500);
+  }
+
+  function stopProgressPolling() {
+    if (progressInterval != null) {
+      clearInterval(progressInterval);
+      progressInterval = null;
+    }
+  }
+
   async function triggerRewrite() {
-    if (!appState || triggering) return;
+    if (!appState || triggering || rewriteRunning) return;
     triggering = true;
     try {
       const tabs = await browser.tabs.query({ active: true, currentWindow: true });
@@ -179,7 +224,10 @@
           type: 'TRIGGER_REWRITE',
           payload: { styleId: appState.settings.activeStyleId },
         });
-        window.close();
+        progressTabId = tab.id;
+        rewriteProgress = { total: segmentCount ?? 0, done: 0, failed: 0, running: true };
+        rewriteRunning = true;
+        startProgressPolling();
       }
     } catch {
       // Content script may not be injected on this page
@@ -429,20 +477,51 @@
       </section>
 
       <section class="px-4 py-3 flex flex-col gap-2 {extractActive ? 'border-b border-base-300' : ''}">
-        <button
-          class="btn btn-primary w-full"
-          onclick={triggerRewrite}
-          disabled={triggering}
-        >
-          {triggering ? 'Wird gestartet…' : segmentCount !== null ? `Seite umformulieren (${segmentCount} Absätze)` : 'Seite umformulieren'}
-        </button>
-        <button
-          class="btn w-full bg-base-300 hover:bg-neutral text-base-content border-0"
-          onclick={extractStyle}
-          disabled={extractActive}
-        >
-          {extracting ? 'Analysiert…' : 'Stil extrahieren'}
-        </button>
+        {#if rewriteRunning && rewriteProgress}
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-base-content">
+                {rewriteProgress.running ? 'Wird umformuliert…' : 'Fertig'}
+              </span>
+              {#if rewriteProgress.running}
+                <span class="loading loading-spinner loading-xs text-primary"></span>
+              {:else}
+                <span class="text-success text-sm">✓</span>
+              {/if}
+            </div>
+            <div class="text-[13px] text-muted">
+              {rewriteProgress.done} von {rewriteProgress.total > 0 ? rewriteProgress.total : '…'} Absätzen
+              {#if rewriteProgress.failed > 0}
+                <span class="text-error"> · {rewriteProgress.failed} fehlgeschlagen</span>
+              {/if}
+            </div>
+            {#if rewriteProgress.total > 0}
+              <progress
+                class="progress progress-primary w-full h-1.5"
+                value={rewriteProgress.done + rewriteProgress.failed}
+                max={rewriteProgress.total}
+              ></progress>
+            {/if}
+            <button class="btn btn-sm w-full" onclick={() => window.close()}>
+              {rewriteProgress.running ? 'Im Hintergrund fortsetzen' : 'Schliessen'}
+            </button>
+          </div>
+        {:else}
+          <button
+            class="btn btn-primary w-full"
+            onclick={triggerRewrite}
+            disabled={triggering}
+          >
+            {triggering ? 'Wird gestartet…' : segmentCount !== null ? `Seite umformulieren (${segmentCount} Absätze)` : 'Seite umformulieren'}
+          </button>
+          <button
+            class="btn w-full bg-base-300 hover:bg-neutral text-base-content border-0"
+            onclick={extractStyle}
+            disabled={extractActive}
+          >
+            {extracting ? 'Analysiert…' : 'Stil extrahieren'}
+          </button>
+        {/if}
       </section>
 
       <ExtractPanel

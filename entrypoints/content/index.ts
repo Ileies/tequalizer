@@ -13,6 +13,8 @@ import {
   getOriginal,
 } from './domSurgeon.ts';
 
+let rewriteProgress: { total: number; done: number; failed: number; running: boolean } | null = null;
+
 export default defineContentScript({
   matches: ['<all_urls>'],
   async main() {
@@ -21,8 +23,37 @@ export default defineContentScript({
         const m = msg as { type: string; payload?: unknown };
         if (m.type === 'TRIGGER_REWRITE') {
           const { styleId } = m.payload as { styleId: string };
-          runAutoRewrite(styleId, chunkRewriter).catch(console.error);
+          rewriteProgress = { total: 0, done: 0, failed: 0, running: true };
+          const trackingRewriter = async (
+            chunk: ChunkInfo,
+            requestId: string,
+            sId: string,
+            signal: AbortSignal
+          ): Promise<void> => {
+            if (rewriteProgress && rewriteProgress.total === 0) {
+              rewriteProgress.total = chunk.totalSegments;
+            }
+            try {
+              await chunkRewriter(chunk, requestId, sId, signal);
+              if (rewriteProgress) rewriteProgress.done += chunk.segments.length;
+            } catch (e) {
+              if (rewriteProgress) rewriteProgress.failed += chunk.segments.length;
+              throw e;
+            }
+          };
+          runAutoRewrite(styleId, trackingRewriter)
+            .then((result) => {
+              rewriteProgress = { total: result.total, done: result.rewritten, failed: result.failed, running: false };
+            })
+            .catch((e) => {
+              if (rewriteProgress) rewriteProgress.running = false;
+              console.error(e);
+            });
           return false;
+        }
+        if (m.type === 'GET_REWRITE_PROGRESS') {
+          sendResponse(rewriteProgress);
+          return true;
         }
         if (m.type === 'GET_PAGE_SAMPLES') {
           const text = collectPageText();
