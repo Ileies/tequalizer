@@ -26,13 +26,17 @@ export const openaiProvider: LLMProvider = {
     try {
       const res = await fetch('https://api.openai.com/v1/models', {
         headers: { Authorization: `Bearer ${apiKey}` },
+        signal: AbortSignal.timeout(10_000),
       });
       if (!res.ok) {
         const body = await res.text();
         return { ok: false, error: mapHttpError(res.status, body) };
       }
       return { ok: true };
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'TimeoutError') {
+        return { ok: false, error: 'Zeitüberschreitung: Keine Antwort von OpenAI innerhalb von 10s.' };
+      }
       return { ok: false, error: 'Netzwerkfehler beim Validieren des API-Keys.' };
     }
   },
@@ -43,6 +47,17 @@ export const openaiProvider: LLMProvider = {
     if (!apiKey) throw new Error('Kein API-Key konfiguriert.');
 
     const model = state.settings.openaiModel ?? 'gpt-4.1-mini';
+
+    // Timeout only for the initial connection; once headers arrive the stream
+    // continues uninterrupted (clearTimeout cancels it before the body is read).
+    const connectionController = new AbortController();
+    const timeoutId = setTimeout(
+      () => connectionController.abort(new DOMException('Netzwerk-Timeout', 'TimeoutError')),
+      10_000
+    );
+    const fetchSignal = req.signal
+      ? AbortSignal.any([req.signal, connectionController.signal])
+      : connectionController.signal;
 
     const res = await fetch(ENDPOINT, {
       method: 'POST',
@@ -58,8 +73,9 @@ export const openaiProvider: LLMProvider = {
         instructions: req.systemPrompt,
         input: req.userPrompt,
       }),
-      signal: req.signal,
+      signal: fetchSignal,
     });
+    clearTimeout(timeoutId);
 
     if (!res.ok || !res.body) {
       const body = await res.text();
