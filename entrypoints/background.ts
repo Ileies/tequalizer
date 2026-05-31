@@ -104,11 +104,7 @@ async function handleMessage(
         sendResponse(result);
       } catch (err) {
         const message = err instanceof Error ? err.message : '';
-        if (message.includes('Not implemented')) {
-          sendResponse({ ok: true });
-        } else {
-          sendResponse({ ok: false, error: message || 'Validierungsfehler.' });
-        }
+        sendResponse({ ok: false, error: message || 'Validierungsfehler.' });
       }
       break;
     }

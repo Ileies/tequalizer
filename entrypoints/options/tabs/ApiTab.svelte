@@ -157,51 +157,23 @@
 
 {#if appState.settings.provider === 'claude'}
   <section class="bg-base-200 border border-base-300 rounded-xl px-7 py-6 mb-5">
-    <div class="flex items-center gap-[10px] mb-3">
-      <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted">Claude API-Key</div>
-      <span class="badge bg-base-300 text-subtext border-0">Experimentell</span>
+    <div class="flex items-center gap-2 text-[13px] text-muted">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>Claude-Unterstützung ist in <strong class="text-base-content">V2</strong> geplant und noch nicht verfügbar.</span>
     </div>
-    <div class="flex gap-2 items-center">
-      <input
-        class="input input-bordered w-full {claudeKeyError ? 'input-error' : ''}"
-        type={showClaudeKey ? 'text' : 'password'}
-        placeholder="sk-ant-…"
-        value={appState.settings.apiKeys.claude ?? ''}
-        onchange={(e) => saveClaudeKey(e.currentTarget.value)}
-        disabled={validatingClaude}
-      />
-      <button
-        class="btn btn-ghost btn-sm"
-        onclick={() => (showClaudeKey = !showClaudeKey)}
-      >{showClaudeKey ? '🙈' : '👁'}</button>
-    </div>
-    {#if validatingClaude}
-      <div class="text-[13px] text-muted mt-2">Prüfe API-Key…</div>
-    {:else if claudeKeyError}
-      <div class="text-[13px] text-error mt-2">{claudeKeyError}</div>
-    {/if}
   </section>
 {/if}
 
 {#if appState.settings.provider === 'ollama'}
   <section class="bg-base-200 border border-base-300 rounded-xl px-7 py-6 mb-5">
-    <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted mb-3">Ollama Endpoint</div>
-    <input
-      class="input input-bordered w-full"
-      type="url"
-      placeholder="http://localhost:11434"
-      value={appState.settings.ollamaEndpoint ?? ''}
-      onchange={(e) => saveOllamaEndpoint(e.currentTarget.value)}
-    />
-
-    <div class="block text-[11px] font-bold uppercase tracking-[0.08em] text-muted mb-3 mt-5">Modell</div>
-    <input
-      class="input input-bordered w-full"
-      type="text"
-      placeholder="llama3"
-      value={appState.settings.ollamaModel ?? ''}
-      onchange={(e) => saveOllamaModel(e.currentTarget.value)}
-    />
+    <div class="flex items-center gap-2 text-[13px] text-muted">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>Ollama-Unterstützung ist in <strong class="text-base-content">V3</strong> geplant und noch nicht verfügbar.</span>
+    </div>
   </section>
 {/if}
 
