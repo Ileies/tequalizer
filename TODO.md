@@ -4,7 +4,7 @@
 
 - [x] **Error-Feedback bei Segment-Fehler** - wenn ein Absatz nicht umformuliert wird (Rate-Limit, Netzwerkfehler), Toast oder Banner zeigen statt still den Original-Text wiederherstellen (`autoRewriteOrchestrator.ts` Fehler in die UI propagieren)
 - [x] **Fortschrittsanzeige beim manuellen Rewrite** - Popup schliesst sich aktuell nach dem Trigger ohne Feedback; laufende Segmente, Done/Failed-Zaehler anzeigen
-- [ ] **Auto-Mode-Feedback** - kurze Benachrichtigung wenn Auto-Rewrite abgeschlossen ist ("Artikel umformuliert" / "Umformulierung fehlgeschlagen")
+- [x] **Auto-Mode-Feedback** - kurze Benachrichtigung wenn Auto-Rewrite abgeschlossen ist ("Artikel umformuliert" / "Umformulierung fehlgeschlagen")
 - [ ] **Claude/Ollama-Validierung reparieren** - Key-Validierung gibt `{ ok: true }` fuer Stub-Provider zurueck und verschleiert den Fehler; Provider mit klarem Hinweis deaktivieren ("kommt in V2/V3")
 - [ ] **Network-Timeout** - `openaiProvider.ts` Fetch-Calls haben kein Timeout; `AbortSignal.timeout()` hinzufuegen (10s)
 - [ ] **Onboarding** - First-Run-Modal das die fuenf Style-Slider erklaert und zeigt wie man startet
