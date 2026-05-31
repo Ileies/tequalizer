@@ -91,6 +91,8 @@ interface BannerElements {
   reportError: (failed: number) => void;
   addStopButton: (controller: AbortController) => void;
   addToggle: (root: Element) => void;
+  setCompletionText: (message: string) => void;
+  dismiss: (delayMs: number) => void;
 }
 
 function createCollapseButton(
@@ -178,6 +180,18 @@ function createBanner(): BannerElements {
       errorText.style.display = failed > 0 ? '' : 'none';
       errorText.textContent = `· ${failed} fehlgeschlagen`;
     },
+    setCompletionText(message) {
+      text.textContent = message;
+      errorText.style.display = 'none';
+      currentLabel = message;
+    },
+    dismiss(delayMs) {
+      setTimeout(() => {
+        root.style.transition = 'opacity 0.5s';
+        root.style.opacity = '0';
+        setTimeout(() => root.remove(), 500);
+      }, delayMs);
+    },
     addStopButton(controller: AbortController) {
       const btn = document.createElement('button');
       btn.textContent = 'Stop';
@@ -230,7 +244,8 @@ function createBanner(): BannerElements {
 export async function runAutoRewrite(
   styleId: string,
   rewriter: ChunkRewriter,
-  root: Element = document.body
+  root: Element = document.body,
+  options?: { autoDismiss?: boolean }
 ): Promise<OrchestratorResult> {
   const segments = segmentDocument(root);
   const rewritable = segments
@@ -280,7 +295,23 @@ export async function runAutoRewrite(
 
   const stopBtn = banner.root.querySelector('button');
   stopBtn?.remove();
-  banner.addToggle(root);
+
+  if (controller.signal.aborted) {
+    banner.setCompletionText('Rewrite abgebrochen');
+  } else if (rewritten === 0 && failed > 0) {
+    banner.setCompletionText('Umformulierung fehlgeschlagen');
+  } else {
+    banner.setCompletionText(
+      failed > 0
+        ? `${rewritten} von ${totalSegments} Abschnitten umformuliert · ${failed} fehlgeschlagen`
+        : 'Artikel umformuliert'
+    );
+    banner.addToggle(root);
+  }
+
+  if (options?.autoDismiss) {
+    banner.dismiss(4000);
+  }
 
   return { total: totalSegments, rewritten, failed, stopped: controller.signal.aborted };
 }

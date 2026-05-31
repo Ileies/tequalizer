@@ -78,7 +78,7 @@ export default defineContentScript({
     const domain = location.hostname;
     if (settings.autoRewrite.excludeDomains.includes(domain)) return;
 
-    await runAutoRewrite(settings.activeStyleId, chunkRewriter);
+    await runAutoRewrite(settings.activeStyleId, chunkRewriter, document.body, { autoDismiss: true });
   },
 });
 
