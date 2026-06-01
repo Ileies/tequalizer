@@ -163,6 +163,40 @@ Five sliders, integer −2 to +2:
 | formality   | Umgangssprachlich    | Standard       | Akademisch             |
 | simplicity  | Komplex/Fachsprache  | Neutral        | Sehr einfach           |
 
+## Troubleshooting
+
+### Warum wurde mein Artikel nicht umformuliert?
+
+**Der "Seite umformulieren"-Button erscheint nicht / ist ausgegraut**
+- Die Seite hat zu wenig Text oder wird von der Erweiterung nicht als Artikel erkannt (Readability-Score zu niedrig). Betrifft typischerweise Startseiten, Social-Media-Feeds, Shop-Seiten und reine Linklisten.
+- Die Seite ist eine Browser-interne Seite (`chrome://`, `about:`, `moz-extension://`) - dort kann kein Content Script ausgefuhrt werden.
+- Die Seite ist ein PDF oder eine lokale Datei.
+
+**Auto-Modus startet nicht**
+- Auto-Modus ist deaktiviert (Popup-Toggle oder Options - Auto-Modus-Tab).
+- Die Domain ist in der Ausschlussliste (Options - Auto-Modus-Tab).
+- Der Artikel unterschreitet die eingestellte Mindestwortanzahl.
+- Die Seite ladt Inhalte dynamisch nach - die Erkennung lauft beim ersten Seitenaufbau. Tab neu laden kann helfen.
+
+**Umformulierung schlagt fehl oder zeigt einen Fehler**
+- API-Key fehlt oder ist ungultig: Key in der Popup-Einrichtungsmaske oder unter Options - API & Anbieter prufen.
+- Rate-Limit des Anbieters erreicht: Kurz warten und erneut versuchen.
+- Netzwerkfehler oder Timeout (10s): Verbindung prufen, Tab neu laden.
+- Ollama oder Claude als Provider ausgewahlt: Diese sind noch nicht implementiert (V2/V3). Zu OpenAI wechseln.
+
+**Diff-View erscheint nicht, obwohl die Umformulierung lauft**
+- Manche Seiten blockieren Shadow DOM oder haben aggressive Content-Security-Policies. In diesem Fall erscheint der Diff nicht, aber der Text wird intern verarbeitet.
+- Tab neu laden und erneut versuchen.
+
+**Einige Absatze fehlen im Diff**
+- Uberschriften, Navigationselemente, Code-Blocke und linkdichte Absatze werden vom Segment-Classifier bewusst herausgefiltert und nicht umformuliert.
+- Sehr kurze Absatze (unter ca. 20 Worter) werden ebenfalls ubersprungen.
+
+**Fidelity-Warnung: "Umformulierung enthalt mogliche Fehler"**
+- Die Erweiterung pruft nach der Umformulierung, ob Zahlen, Daten, Eigennamen und Zitate erhalten geblieben sind. Bei hohem Schweregrad wird die Umformulierung blockiert. Das ist ein Schutzmechanismus gegen sachliche Verfalsschungen durch das KI-Modell.
+
+---
+
 ## Tech stack
 
 | Tool | Role |
