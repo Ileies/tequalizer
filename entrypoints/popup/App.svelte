@@ -21,6 +21,7 @@
   let keySaved = $state(false);
   let keyError = $state('');
   let rewriteRunning = $state(false);
+  let dragStyleId = $state<string | null>(null);
   let rewriteProgress = $state<{ total: number; done: number; failed: number; running: boolean } | null>(null);
   let progressTabId: number | null = null;
   let progressInterval: ReturnType<typeof setInterval> | null = null;
@@ -142,6 +143,7 @@
   async function onStyleChange(id: string) {
     pendingDimensions = null;
     liveValues = {};
+    dragStyleId = null;
     await persistPending(id, null);
     await updateSettings({ activeStyleId: id });
     await refresh();
@@ -422,11 +424,17 @@
                   step="1"
                   class="dim-slider w-full h-5 relative z-[2] bg-transparent cursor-pointer"
                   value={val}
-                  oninput={(e) => { liveValues[dim.key] = Number(e.currentTarget.value); }}
+                  onpointerdown={() => { dragStyleId = activeStyle?.id ?? null; }}
+                  oninput={(e) => {
+                    if (dragStyleId !== (activeStyle?.id ?? null)) return;
+                    liveValues[dim.key] = Number(e.currentTarget.value);
+                  }}
                   onchange={(e) => {
+                    if (dragStyleId !== (activeStyle?.id ?? null)) { dragStyleId = null; return; }
                     const v = Number(e.currentTarget.value);
                     onDimChange(dim.key, v);
                     delete liveValues[dim.key];
+                    dragStyleId = null;
                   }}
                 />
               </div>
