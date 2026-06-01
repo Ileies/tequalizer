@@ -13,10 +13,10 @@
 
 ## Pre-launch: Store Submission
 
-- [ ] **Datenschutzerklaerung** - fuer Chrome Web Store und Firefox Add-ons Pflicht
-- [ ] **Store-Assets** - Screenshots, Promotional Images, Store-Beschreibung (DE + EN)
-- [ ] **Permissions-Begruendung** - dokumentieren warum `<all_urls>` benoetigt wird (beide Stores verlangen das)
-- [ ] **Troubleshooting im README** - "Warum wurde mein Artikel nicht umformuliert?", bekannte Einschraenkungen
+- [x] **Datenschutzerklaerung** - fuer Chrome Web Store und Firefox Add-ons Pflicht
+- [x] **Store-Assets** - Screenshots, Promotional Images, Store-Beschreibung (DE + EN)
+- [x] **Permissions-Begruendung** - dokumentieren warum `<all_urls>` benoetigt wird (beide Stores verlangen das)
+- [x] **Troubleshooting im README** - "Warum wurde mein Artikel nicht umformuliert?", bekannte Einschraenkungen
 
 ## UI
 
@@ -29,7 +29,7 @@
 
 ## UX
 
-- [ ] **Slider-State Race Condition** - `liveValues` im Popup wird nicht zurueckgesetzt wenn der Nutzer den Style wechselt waehrend ein Slider gezogen wird; Style-Wechsel soll `liveValues` zuruecksetzen
+- [x] **Slider-State Race Condition** - `liveValues` im Popup wird nicht zurueckgesetzt wenn der Nutzer den Style wechselt waehrend ein Slider gezogen wird; Style-Wechsel soll `liveValues` zuruecksetzen
 - [x] **`window.close()` zu frueh** - in `triggerRewrite()` schliesst sich das Popup bevor die Message bestaetigt wurde; erst nach erfolgreicher Uebertragung schliessen
 - [x] **Extraction-Button erneut klickbar** - waehrend Extraktionsergebnisse angezeigt werden kann "Stil extrahieren" nochmals geklickt werden; Button disabled halten waehrend Ergebnis sichtbar ist
 - [x] **Keyboard-Support ToggleSwitch** - `Space`/`Enter` loesen den Toggle nicht aus; `onkeydown`-Handler in `ToggleSwitch.svelte` erganzen
