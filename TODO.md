@@ -21,7 +21,7 @@
 ## UI
 
 - [x] **Empty State Styles-Tab** - Style-Liste zeigt nichts wenn leer; leeren Zustand mit Call-to-Action anzeigen (`StylesTab.svelte`)
-- [ ] **Ungespeicherte Aenderungen in KnowledgeTab** - kein Hinweis wenn der Profiltext geaendert aber noch nicht gespeichert wurde; Indicator anzeigen wenn `profileText !== savedText`
+- [x] **Ungespeicherte Aenderungen in KnowledgeTab** - kein Hinweis wenn der Profiltext geaendert aber noch nicht gespeichert wurde; Indicator anzeigen wenn `profileText !== savedText`
 - [ ] **Bestaetigung fuer "Verwerfen"** - der Verwerfen-Button im Popup hat keine Bestaetigung; Nutzer koennten versehentlich ausloefen
 - [ ] **Min-Word-Count Input** - negative Werte werden erst nach `onchange` korrigiert, sichtbar fuer den Nutzer; auf `oninput` umstellen (`AutoModeTab.svelte`)
 - [ ] **Domain-Validierung** - in `AutoModeTab.svelte` werden ungueltige Domain-Eingaben (Leerzeichen, Sonderzeichen) lautlos akzeptiert; regex-Validierung + Warnhinweis hinzufuegen

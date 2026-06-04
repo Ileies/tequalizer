@@ -12,6 +12,8 @@
   } = $props();
 
   let profileText = $state(untrack(() => appState.settings.knownKnowledge.profileText));
+  let savedText = $state(untrack(() => appState.settings.knownKnowledge.profileText));
+  let hasUnsaved = $derived(profileText !== savedText);
   let savedMsg = $state('');
   let savedTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -30,6 +32,7 @@
   async function saveProfileText(text: string) {
     const knownKnowledge = $state.snapshot(appState.settings.knownKnowledge);
     await updateSettings({ knownKnowledge: { ...knownKnowledge, profileText: text } });
+    savedText = text;
     await onRefresh();
     showSaved();
   }
@@ -65,6 +68,9 @@
     bind:value={profileText}
   ></textarea>
   <div class="flex items-center gap-3 mt-4">
+    {#if hasUnsaved}
+      <span class="text-xs text-warning">Ungespeicherte Änderungen</span>
+    {/if}
     <span class="text-xs text-muted ml-auto">{profileText.length} / 2000</span>
     <button
       class="btn btn-primary"
