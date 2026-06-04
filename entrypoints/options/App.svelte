@@ -86,23 +86,26 @@
         </div>
       </div>
 
-      <div
-        id="panel-{activeTab}"
-        role="tabpanel"
-        aria-labelledby="tab-{activeTab}"
-        tabindex="0"
-        class="flex-1 px-16 py-[52px] max-w-[820px] focus:outline-none"
-      >
-        {#if activeTab === 'api'}
-          <ApiTab appState={appState} onRefresh={refresh} />
-        {:else if activeTab === 'styles'}
-          <StylesTab appState={appState} onRefresh={refresh} />
-        {:else if activeTab === 'automode'}
-          <AutoModeTab appState={appState} onRefresh={refresh} />
-        {:else if activeTab === 'knowledge'}
-          <KnowledgeTab appState={appState} onRefresh={refresh} />
-        {/if}
-      </div>
+      {#each TABS as [tab]}
+        <div
+          id="panel-{tab}"
+          role="tabpanel"
+          aria-labelledby="tab-{tab}"
+          tabindex={activeTab === tab ? 0 : -1}
+          class="flex-1 px-16 py-[52px] max-w-[820px] focus:outline-none"
+          class:hidden={activeTab !== tab}
+        >
+          {#if tab === 'api'}
+            <ApiTab appState={appState} onRefresh={refresh} />
+          {:else if tab === 'styles'}
+            <StylesTab appState={appState} onRefresh={refresh} />
+          {:else if tab === 'automode'}
+            <AutoModeTab appState={appState} onRefresh={refresh} />
+          {:else if tab === 'knowledge'}
+            <KnowledgeTab appState={appState} onRefresh={refresh} />
+          {/if}
+        </div>
+      {/each}
     </div>
   {/if}
 </div>
