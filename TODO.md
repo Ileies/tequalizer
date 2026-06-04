@@ -14,7 +14,7 @@
 
 ## Future
 
-- [ ] Rewrite-History / Undo - nach dem Akzeptieren eines Rewrites zurueck zum Original ohne Seiten-Reload
+- [x] Rewrite-History / Undo - nach dem Akzeptieren eines Rewrites zurueck zum Original ohne Seiten-Reload
 - [ ] Context-Menu-Rewrite - Rechtsklick auf einen Absatz um nur diesen umzuformulieren
 - [ ] Dynamische Modellliste - verfuegbare Modelle von der OpenAI API laden statt hartcodierter Liste
 - [ ] Diff View fuer Auto-Mode - optional Diff anzeigen bevor Auto-Mode-Rewrites uebernommen werden
