@@ -10,6 +10,7 @@ import {
   finalizeStreaming,
   addHoverPreview,
   restoreOriginal,
+  restoreAll,
   getOriginal,
 } from './domSurgeon.ts';
 
@@ -63,6 +64,12 @@ export default defineContentScript({
         if (m.type === 'GET_SEGMENT_COUNT') {
           const count = segmentDocument().filter((s) => shouldRewrite(s).rewrite).length;
           sendResponse({ count });
+          return true;
+        }
+        if (m.type === 'RESTORE_ALL') {
+          restoreAll();
+          rewriteProgress = null;
+          sendResponse(undefined);
           return true;
         }
         return false;

@@ -27,7 +27,8 @@ export type Message =
       };
     }
   | { type: 'CHUNK_REWRITE_DONE'; payload: { requestId: string } }
-  | { type: 'GET_REWRITE_PROGRESS' };
+  | { type: 'GET_REWRITE_PROGRESS' }
+  | { type: 'RESTORE_ALL' };
 
 export type MessageType = Message['type'];
 
@@ -49,4 +50,6 @@ export type ResponseFor<T extends Message> = T extends { type: 'GET_SETTINGS' }
             ? { ok: boolean; error?: string }
             : T extends { type: 'GET_REWRITE_PROGRESS' }
               ? { total: number; done: number; failed: number; running: boolean } | null
-              : void;
+              : T extends { type: 'RESTORE_ALL' }
+                ? void
+                : void;

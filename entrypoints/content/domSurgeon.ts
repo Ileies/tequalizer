@@ -95,3 +95,12 @@ export function showRewritten(root: Element = document.body): void {
     }
   });
 }
+
+export function restoreAll(root: Element = document.body): number {
+  let count = 0;
+  root.querySelectorAll('[data-rewritten="true"]').forEach((el) => {
+    restoreOriginal(el);
+    count++;
+  });
+  return count;
+}
