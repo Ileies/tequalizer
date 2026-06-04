@@ -25,6 +25,7 @@
   let keySaved = $state(false);
   let keyError = $state('');
   let rewriteRunning = $state(false);
+  let confirmDiscard = $state(false);
   let dragStyleId = $state<string | null>(null);
   let rewriteProgress = $state<{ total: number; done: number; failed: number; running: boolean } | null>(null);
   let progressTabId: number | null = null;
@@ -154,6 +155,7 @@
 
   async function onStyleChange(id: string) {
     pendingDimensions = null;
+    confirmDiscard = false;
     liveValues = {};
     dragStyleId = null;
     await persistPending(id, null);
@@ -458,17 +460,31 @@
           {/each}
           {#if pendingDimensions}
             <div class="flex items-center justify-between mt-2 pt-2 border-t border-base-300">
-              <span class="text-[11px] text-muted">Nicht gespeichert</span>
-              <div class="flex gap-2">
-                <button
-                  class="btn btn-ghost btn-xs"
-                  onclick={() => { pendingDimensions = null; if (activeStyle) persistPending(activeStyle.id, null); }}
-                >Verwerfen</button>
-                <button
-                  class="btn btn-primary btn-xs"
-                  onclick={savePending}
-                >Speichern</button>
-              </div>
+              {#if confirmDiscard}
+                <span class="text-[11px] text-muted">Änderungen verwerfen?</span>
+                <div class="flex gap-2">
+                  <button
+                    class="btn btn-ghost btn-xs"
+                    onclick={() => { confirmDiscard = false; }}
+                  >Abbrechen</button>
+                  <button
+                    class="btn btn-error btn-xs"
+                    onclick={() => { confirmDiscard = false; pendingDimensions = null; if (activeStyle) persistPending(activeStyle.id, null); }}
+                  >Verwerfen</button>
+                </div>
+              {:else}
+                <span class="text-[11px] text-muted">Nicht gespeichert</span>
+                <div class="flex gap-2">
+                  <button
+                    class="btn btn-ghost btn-xs"
+                    onclick={() => { confirmDiscard = true; }}
+                  >Verwerfen</button>
+                  <button
+                    class="btn btn-primary btn-xs"
+                    onclick={savePending}
+                  >Speichern</button>
+                </div>
+              {/if}
             </div>
           {/if}
         </section>
