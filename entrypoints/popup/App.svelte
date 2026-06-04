@@ -1,12 +1,13 @@
 <script lang="ts">
+  import { z } from 'zod';
   import { getState, updateSettings } from '../../src/storage/storageAdapter.ts';
   import { saveStyle, createStyle } from '../../src/style-engine/library.ts';
   import { DIMS } from '../../src/ui/dims.ts';
   import { sendMessage } from '../../src/messaging/client.ts';
   import ExtractPanel from './ExtractPanel.svelte';
   import OnboardingModal from './OnboardingModal.svelte';
-  import type { StoredState, StyleConfig, Settings } from '../../src/storage/schema.ts';
-  import type { ExtractedStyle } from '../../src/llm/styleExtractor.ts';
+  import { StyleConfig, type StoredState, type Settings } from '../../src/storage/schema.ts';
+  import { ExtractedStyle } from '../../src/llm/styleExtractor.ts';
   import { SESSION_KEY_POPUP_PENDING, SESSION_KEY_EXTRACT_RESULT } from '../../src/constants.ts';
 
   const ONBOARDING_KEY = 'onboarding_v1_done';
@@ -75,12 +76,24 @@
   const SESSION_KEY = SESSION_KEY_POPUP_PENDING;
   const EXTRACT_KEY = SESSION_KEY_EXTRACT_RESULT;
 
-  type PendingSession = { styleId: string; dimensions: StyleConfig['dimensions'] };
+  const PendingSessionSchema = z.object({
+    styleId: z.string(),
+    dimensions: StyleConfig.shape.dimensions,
+  });
+
+  const SegmentCountSchema = z.object({ count: z.number() });
+
+  const RewriteProgressSchema = z.object({
+    total: z.number(),
+    done: z.number(),
+    failed: z.number(),
+    running: z.boolean(),
+  });
 
   async function loadPending(styleId: string) {
-    const result = await browser.storage.session.get(SESSION_KEY) as Record<string, PendingSession>;
-    const stored = result[SESSION_KEY];
-    if (stored?.styleId === styleId) pendingDimensions = stored.dimensions;
+    const result = await browser.storage.session.get(SESSION_KEY);
+    const parsed = PendingSessionSchema.safeParse(result[SESSION_KEY]);
+    if (parsed.success && parsed.data.styleId === styleId) pendingDimensions = parsed.data.dimensions;
   }
 
   async function persistPending(styleId: string, dims: StyleConfig['dimensions'] | null) {
@@ -92,9 +105,9 @@
   }
 
   async function loadExtractResult() {
-    const result = await browser.storage.session.get(EXTRACT_KEY) as Record<string, ExtractedStyle>;
-    const stored = result[EXTRACT_KEY];
-    if (stored) extractResult = stored;
+    const result = await browser.storage.session.get(EXTRACT_KEY);
+    const parsed = ExtractedStyle.safeParse(result[EXTRACT_KEY]);
+    if (parsed.success) extractResult = parsed.data;
   }
 
   async function persistExtractResult(result: ExtractedStyle | null) {
@@ -124,15 +137,17 @@
       if (tabId == null) return;
       progressTabId = tabId;
       try {
-        const countResult = (await browser.tabs.sendMessage(tabId, { type: 'GET_SEGMENT_COUNT' })) as { count: number } | null;
-        if (countResult) segmentCount = countResult.count;
+        const countResult = await browser.tabs.sendMessage(tabId, { type: 'GET_SEGMENT_COUNT' });
+        const countParsed = SegmentCountSchema.safeParse(countResult);
+        if (countParsed.success) segmentCount = countParsed.data.count;
       } catch {
         // Content script not injected on this page
       }
       try {
-        const progress = (await browser.tabs.sendMessage(tabId, { type: 'GET_REWRITE_PROGRESS' })) as { total: number; done: number; failed: number; running: boolean } | null;
-        if (progress?.running) {
-          rewriteProgress = progress;
+        const progressResult = await browser.tabs.sendMessage(tabId, { type: 'GET_REWRITE_PROGRESS' });
+        const progressParsed = RewriteProgressSchema.safeParse(progressResult);
+        if (progressParsed.success && progressParsed.data.running) {
+          rewriteProgress = progressParsed.data;
           rewriteRunning = true;
           startProgressPolling();
         }
@@ -166,14 +181,14 @@
 
   function onDimChange(key: keyof StyleConfig['dimensions'], value: number) {
     if (!activeStyle) return;
-    const base = pendingDimensions ?? ($state.snapshot(activeStyle) as StyleConfig).dimensions;
+    const base = pendingDimensions ?? $state.snapshot(activeStyle!).dimensions;
     pendingDimensions = { ...base, [key]: value };
     persistPending(activeStyle.id, pendingDimensions);
   }
 
   async function savePending() {
     if (!pendingDimensions || !activeStyle) return;
-    const base = $state.snapshot(activeStyle) as StyleConfig;
+    const base = $state.snapshot(activeStyle!);
     const newStyle = createStyle({
       name: 'Benutzerdefiniert',
       dimensions: pendingDimensions,
@@ -208,10 +223,11 @@
         return;
       }
       try {
-        const result = (await browser.tabs.sendMessage(progressTabId, { type: 'GET_REWRITE_PROGRESS' })) as { total: number; done: number; failed: number; running: boolean } | null;
-        if (result != null) {
-          rewriteProgress = result;
-          if (!result.running) stopProgressPolling();
+        const progressResult = await browser.tabs.sendMessage(progressTabId, { type: 'GET_REWRITE_PROGRESS' });
+        const progressParsed = RewriteProgressSchema.safeParse(progressResult);
+        if (progressParsed.success) {
+          rewriteProgress = progressParsed.data;
+          if (!progressParsed.data.running) stopProgressPolling();
         } else {
           rewriteProgress = rewriteProgress ? { ...rewriteProgress, running: false } : null;
           stopProgressPolling();
@@ -276,15 +292,21 @@
         extractError = 'Kein auswertbarer Text auf der Seite.';
         return;
       }
-      const result = (await browser.runtime.sendMessage({
+      const raw = await browser.runtime.sendMessage({
         type: 'EXTRACT_STYLE',
         payload: { text: pageData.text },
-      })) as ExtractedStyle | { error: string };
-      if ('error' in result) {
-        extractError = result.error;
+      });
+      const errorParsed = z.object({ error: z.string() }).safeParse(raw);
+      if (errorParsed.success) {
+        extractError = errorParsed.data.error;
       } else {
-        extractResult = result;
-        await persistExtractResult(result);
+        const styleParsed = ExtractedStyle.safeParse(raw);
+        if (styleParsed.success) {
+          extractResult = styleParsed.data;
+          await persistExtractResult(styleParsed.data);
+        } else {
+          extractError = 'Ungültige Antwort vom Server.';
+        }
       }
     } catch (err) {
       extractError = err instanceof Error ? err.message : 'Unbekannter Fehler';
@@ -295,7 +317,7 @@
 
   async function applyExtracted() {
     if (!activeStyle || !extractResult) return;
-    const base = $state.snapshot(activeStyle) as StyleConfig;
+    const base = $state.snapshot(activeStyle!);
     await saveStyle({
       ...base,
       dimensions: extractResult.dimensions,

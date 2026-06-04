@@ -1,9 +1,12 @@
-import type { StyleConfig } from '../storage/schema.ts';
+import { z } from 'zod';
+import { StyleConfig } from '../storage/schema.ts';
 
-export interface ExtractedStyle {
-  dimensions: StyleConfig['dimensions'];
-  customInstructions: string;
-}
+export const ExtractedStyle = z.object({
+  dimensions: StyleConfig.shape.dimensions,
+  customInstructions: z.string(),
+});
+
+export type ExtractedStyle = z.infer<typeof ExtractedStyle>;
 
 const EXTRACTION_SYSTEM_PROMPT = `Du analysierst den Schreibstil eines Textes und leitest daraus konkrete Schreibanweisungen ab.
 Gib AUSSCHLIESSLICH ein JSON-Objekt zurück – kein Markdown, kein Vorspann, kein Nachspann.
