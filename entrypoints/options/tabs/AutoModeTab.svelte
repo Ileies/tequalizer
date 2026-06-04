@@ -15,6 +15,15 @@
   let savedMsg = $state('');
   let savedTimer: ReturnType<typeof setTimeout> | null = null;
 
+  const DOMAIN_RE = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,63}$/;
+
+  const invalidDomains = $derived(
+    excludeDomainsText
+      .split('\n')
+      .map((d) => d.trim())
+      .filter((d) => d.length > 0 && !DOMAIN_RE.test(d))
+  );
+
   function showSaved() {
     savedMsg = 'Gespeichert ✓';
     if (savedTimer) clearTimeout(savedTimer);
@@ -34,6 +43,7 @@
   }
 
   async function saveExcludeDomains() {
+    if (invalidDomains.length > 0) return;
     const autoRewrite = $state.snapshot(appState.settings.autoRewrite);
     const domains = excludeDomainsText
       .split('\n')
@@ -99,10 +109,16 @@
     placeholder="example.com&#10;news.example.org"
     bind:value={excludeDomainsText}
   ></textarea>
+  {#if invalidDomains.length > 0}
+    <p class="text-[12px] text-error mt-2">
+      Ungültige {invalidDomains.length === 1 ? 'Domain' : 'Domains'}: {invalidDomains.join(', ')}
+    </p>
+  {/if}
   <div class="flex items-center gap-3 mt-4">
     <button
       class="btn btn-primary"
       onclick={saveExcludeDomains}
+      disabled={invalidDomains.length > 0}
     >Speichern</button>
     {#if savedMsg}
       <span class="text-[13px] text-success">{savedMsg}</span>
