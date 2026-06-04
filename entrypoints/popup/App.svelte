@@ -7,6 +7,7 @@
   import OnboardingModal from './OnboardingModal.svelte';
   import type { StoredState, StyleConfig, Settings } from '../../src/storage/schema.ts';
   import type { ExtractedStyle } from '../../src/llm/styleExtractor.ts';
+  import { SESSION_KEY_POPUP_PENDING, SESSION_KEY_EXTRACT_RESULT } from '../../src/constants.ts';
 
   const ONBOARDING_KEY = 'onboarding_v1_done';
 
@@ -71,8 +72,8 @@
     }
   }
 
-  const SESSION_KEY = 'popup_pending';
-  const EXTRACT_KEY = 'popup_extract_result';
+  const SESSION_KEY = SESSION_KEY_POPUP_PENDING;
+  const EXTRACT_KEY = SESSION_KEY_EXTRACT_RESULT;
 
   type PendingSession = { styleId: string; dimensions: StyleConfig['dimensions'] };
 
