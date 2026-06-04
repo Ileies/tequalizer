@@ -4,10 +4,14 @@
   import { DIMS } from '../../src/ui/dims.ts';
   import { sendMessage } from '../../src/messaging/client.ts';
   import ExtractPanel from './ExtractPanel.svelte';
+  import OnboardingModal from './OnboardingModal.svelte';
   import type { StoredState, StyleConfig, Settings } from '../../src/storage/schema.ts';
   import type { ExtractedStyle } from '../../src/llm/styleExtractor.ts';
 
+  const ONBOARDING_KEY = 'onboarding_v1_done';
+
   let appState = $state<StoredState | null>(null);
+  let showOnboarding = $state(false);
   let liveValues = $state<Partial<Record<keyof StyleConfig['dimensions'], number>>>({});
   let pendingDimensions = $state<StyleConfig['dimensions'] | null>(null);
   let triggering = $state(false);
@@ -99,11 +103,19 @@
     }
   }
 
+  async function dismissOnboarding() {
+    await browser.storage.local.set({ [ONBOARDING_KEY]: true });
+    showOnboarding = false;
+  }
+
   $effect(() => {
     getState().then(async (s) => {
       appState = s;
       await loadPending(s.settings.activeStyleId);
       await loadExtractResult();
+    });
+    browser.storage.local.get(ONBOARDING_KEY).then((result) => {
+      if (!result[ONBOARDING_KEY]) showOnboarding = true;
     });
     browser.tabs.query({ active: true, currentWindow: true }).then(async (tabs) => {
       const tabId = tabs[0]?.id;
@@ -312,7 +324,10 @@
   }
 </script>
 
-<div class="w-[360px] min-h-[120px]">
+<div class="relative w-[360px] min-h-[120px]">
+  {#if showOnboarding && appState}
+    <OnboardingModal onDismiss={dismissOnboarding} />
+  {/if}
   {#if !appState}
     <div class="p-8 text-center text-muted text-sm">Laden…</div>
   {:else}

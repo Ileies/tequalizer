@@ -7,7 +7,7 @@
 - [x] **Auto-Mode-Feedback** - kurze Benachrichtigung wenn Auto-Rewrite abgeschlossen ist ("Artikel umformuliert" / "Umformulierung fehlgeschlagen")
 - [x] **Claude/Ollama-Validierung reparieren** - Key-Validierung gibt `{ ok: true }` fuer Stub-Provider zurueck und verschleiert den Fehler; Provider mit klarem Hinweis deaktivieren ("kommt in V2/V3")
 - [x] **Network-Timeout** - `openaiProvider.ts` Fetch-Calls haben kein Timeout; `AbortSignal.timeout()` hinzufuegen (10s)
-- [ ] **Onboarding** - First-Run-Modal das die fuenf Style-Slider erklaert und zeigt wie man startet
+- [x] **Onboarding** - First-Run-Modal das die fuenf Style-Slider erklaert und zeigt wie man startet
 - [x] **API-Key-Validierung im Popup** - `saveKey()` in `popup/App.svelte` speichert Keys ohne Validierung; dieselbe Logik wie in `ApiTab.svelte` (`VALIDATE_API_KEY` Message) anwenden
 - [x] **API-Key nach Speichern leeren** - nach erfolgreichem Speichern in `popup/App.svelte` den Input-Inhalt loeschen
 
