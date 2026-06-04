@@ -27,6 +27,7 @@
   let keySaved = $state(false);
   let keyError = $state('');
   let rewriteRunning = $state(false);
+  let undoing = $state(false);
   let confirmDiscard = $state(false);
   let dragStyleId = $state<string | null>(null);
   let rewriteProgress = $state<{ total: number; done: number; failed: number; running: boolean } | null>(null);
@@ -146,10 +147,12 @@
       try {
         const progressResult = await browser.tabs.sendMessage(tabId, { type: 'GET_REWRITE_PROGRESS' });
         const progressParsed = RewriteProgressSchema.safeParse(progressResult);
-        if (progressParsed.success && progressParsed.data.running) {
+        if (progressParsed.success) {
           rewriteProgress = progressParsed.data;
-          rewriteRunning = true;
-          startProgressPolling();
+          if (progressParsed.data.running) {
+            rewriteRunning = true;
+            startProgressPolling();
+          }
         }
       } catch {
         // Content script not injected
@@ -266,6 +269,20 @@
       // Content script may not be injected on this page
     } finally {
       triggering = false;
+    }
+  }
+
+  async function undoRewrites() {
+    if (progressTabId == null || undoing) return;
+    undoing = true;
+    try {
+      await browser.tabs.sendMessage(progressTabId, { type: 'RESTORE_ALL' });
+      rewriteProgress = null;
+      rewriteRunning = false;
+    } catch {
+      // Content script not available
+    } finally {
+      undoing = false;
     }
   }
 
@@ -564,9 +581,18 @@
                 max={rewriteProgress.total}
               ></progress>
             {/if}
-            <button class="btn btn-sm w-full" onclick={() => window.close()}>
-              {rewriteProgress.running ? 'Im Hintergrund fortsetzen' : 'Schliessen'}
-            </button>
+            {#if rewriteProgress.running}
+              <button class="btn btn-sm w-full" onclick={() => window.close()}>Im Hintergrund fortsetzen</button>
+            {:else}
+              <div class="flex gap-2">
+                <button class="btn btn-sm flex-1" onclick={() => window.close()}>Schliessen</button>
+                <button
+                  class="btn btn-sm flex-1"
+                  onclick={undoRewrites}
+                  disabled={undoing}
+                >{undoing ? '…' : 'Rückgängig'}</button>
+              </div>
+            {/if}
           </div>
         {:else}
           <button
@@ -583,6 +609,13 @@
           >
             {extracting ? 'Analysiert…' : 'Stil extrahieren'}
           </button>
+          {#if rewriteProgress && !rewriteProgress.running && rewriteProgress.done > 0}
+            <button
+              class="btn btn-sm w-full bg-base-300 hover:bg-neutral text-base-content border-0"
+              onclick={undoRewrites}
+              disabled={undoing}
+            >{undoing ? 'Wird zurückgesetzt…' : `Rückgängig (${rewriteProgress.done} Absätze)`}</button>
+          {/if}
         {/if}
       </section>
 
