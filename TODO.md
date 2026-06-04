@@ -10,7 +10,7 @@
 
 ## Website
 
-- [ ] **Marketing-/Download-/Docs-Website** - separate Website (im Repo unter `website/`) fuer Projektpraesentation, Download-Links zu den Store-Eintraegen und Nutzerdokumentation (Erste Schritte, Style-Dimensionen, FAQ, Datenschutz)
+- [x] **Marketing-/Download-/Docs-Website** - separate Website (im Repo unter `website/`) fuer Projektpraesentation, Download-Links zu den Store-Eintraegen und Nutzerdokumentation (Erste Schritte, Style-Dimensionen, FAQ, Datenschutz)
 
 ## Future
 

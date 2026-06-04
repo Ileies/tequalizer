@@ -1,0 +1,94 @@
+import { a7 as head, a as ensure_array_like, e as escape_html, c as attr_class } from "../../chunks/index.js";
+function _page($$renderer) {
+  const features = [
+    {
+      icon: "🎚",
+      title: "Funf Style-Regler",
+      desc: "Lange, Bildsprache, Warme, Formalitat und Komplexitat - jeder Regler von -2 bis +2 in ganzzahligen Stufen."
+    },
+    {
+      icon: "📚",
+      title: "Style-Bibliothek",
+      desc: "Mehrere benannte Stile anlegen und mit einem Klick zwischen ihnen wechseln."
+    },
+    {
+      icon: "🤖",
+      title: "Auto-Modus",
+      desc: "Erkannte Artikel werden beim Seitenaufruf automatisch umformuliert - ohne manuellen Klick."
+    },
+    {
+      icon: "🔍",
+      title: "Diff-Ansicht",
+      desc: "Original und Umformulierung nebeneinander mit Wort-Hervorhebung. Akzeptieren oder verwerfen."
+    },
+    {
+      icon: "✨",
+      title: "Stil extrahieren",
+      desc: "Den Schreibstil einer beliebigen Seite automatisch analysieren und als eigenen Stil importieren."
+    },
+    {
+      icon: "🔒",
+      title: "100% lokal & privat",
+      desc: "Alle Daten bleiben im Browser. Kein Server, keine Telemetrie, keine Nutzerkonten."
+    }
+  ];
+  const steps = [
+    {
+      n: "1",
+      title: "Extension installieren",
+      desc: "Tequalizer aus dem Chrome Web Store oder Firefox Add-ons installieren."
+    },
+    {
+      n: "2",
+      title: "API-Schlussel eingeben",
+      desc: "Eigenen OpenAI API-Schlussel in den Einstellungen hinterlegen. Der Schlussel bleibt lokal."
+    },
+    {
+      n: "3",
+      title: "Artikel umformulieren",
+      desc: 'Popup offnen, Style-Regler einstellen und "Seite umformulieren" klicken.'
+    }
+  ];
+  head("1uha8ag", $$renderer, ($$renderer2) => {
+    $$renderer2.title(($$renderer3) => {
+      $$renderer3.push(`<title>Tequalizer - Artikel in deinem Stil</title>`);
+    });
+  });
+  $$renderer.push(`<section class="hero min-h-[70vh] bg-gradient-to-br from-base-100 via-base-100 to-primary/5"><div class="hero-content text-center max-w-3xl py-20 px-4"><div><div class="badge badge-primary badge-outline mb-4">Browser-Extension</div> <h1 class="text-5xl md:text-6xl font-extrabold leading-tight mb-6">Artikel in<br/><span class="text-primary">deinem Stil.</span></h1> <p class="text-lg md:text-xl text-base-content/70 max-w-xl mx-auto mb-10">Tequalizer formuliert Blogartikel, News und Texte direkt im Browser in deinem personlichen Schreibstil um -
+        mit funf przisen Reglern fur Ton, Lange und Komplexitat.</p> <div class="flex flex-wrap gap-3 justify-center"><a href="/download" class="btn btn-primary btn-lg gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Kostenlos herunterladen</a> <a href="/docs/getting-started" class="btn btn-outline btn-lg">Erste Schritte</a></div></div></div></section> <section class="py-20 px-4 bg-base-100"><div class="max-w-5xl mx-auto"><h2 class="text-3xl font-bold text-center mb-3">Was Tequalizer kann</h2> <p class="text-center text-base-content/60 mb-12">Alles was du brauchst, um Texte nach deinen Vorstellungen zu lesen.</p> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"><!--[-->`);
+  const each_array = ensure_array_like(features);
+  for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
+    let f = each_array[$$index];
+    $$renderer.push(`<div class="card bg-base-200 border border-base-300"><div class="card-body"><div class="text-3xl mb-2">${escape_html(f.icon)}</div> <h3 class="card-title text-base">${escape_html(f.title)}</h3> <p class="text-sm text-base-content/70">${escape_html(f.desc)}</p></div></div>`);
+  }
+  $$renderer.push(`<!--]--></div></div></section> <section class="py-20 px-4 bg-base-200 border-y border-base-300"><div class="max-w-4xl mx-auto"><div class="flex flex-col lg:flex-row items-center gap-12"><div class="flex-1"><h2 class="text-3xl font-bold mb-4">Funf Regler. Unendliche Varianten.</h2> <p class="text-base-content/70 mb-6">Stelle jeden Aspekt des Schreibstils separat ein - von extrem kompakt bis sehr ausfuhrlich,
+          von rein sachlich bis sehr bildhaft. Jede Kombination ergibt einen einzigartigen Ton.</p> <a href="/docs/style-dimensions" class="link link-primary text-sm">Alle Dimensionen erklart →</a></div> <div class="flex-1 w-full max-w-sm"><div class="card bg-base-100 border border-base-300 shadow-sm"><div class="card-body gap-4 py-5"><!--[-->`);
+  const each_array_1 = ensure_array_like([
+    ["Lange", 1],
+    ["Bildsprache", -1],
+    ["Warme", 2],
+    ["Formalitat", 0],
+    ["Komplexitat", -2]
+  ]);
+  for (let $$index_2 = 0, $$length = each_array_1.length; $$index_2 < $$length; $$index_2++) {
+    let [label, val] = each_array_1[$$index_2];
+    $$renderer.push(`<div class="flex items-center gap-3"><span class="text-xs text-base-content/60 w-20 shrink-0">${escape_html(label)}</span> <div class="flex-1 flex items-center gap-1"><!--[-->`);
+    const each_array_2 = ensure_array_like([-2, -1, 0, 1, 2]);
+    for (let $$index_1 = 0, $$length2 = each_array_2.length; $$index_1 < $$length2; $$index_1++) {
+      let step = each_array_2[$$index_1];
+      $$renderer.push(`<div${attr_class("flex-1 h-2 rounded-full transition-colors", void 0, { "bg-primary": step === val, "bg-base-300": step !== val })}></div>`);
+    }
+    $$renderer.push(`<!--]--></div> <span class="text-xs font-mono text-primary w-4 text-right">${escape_html(val > 0 ? `+${val}` : val)}</span></div>`);
+  }
+  $$renderer.push(`<!--]--></div></div></div></div></div></section> <section class="py-20 px-4 bg-base-100"><div class="max-w-3xl mx-auto"><h2 class="text-3xl font-bold text-center mb-12">In drei Schritten loslegen</h2> <div class="flex flex-col gap-8"><!--[-->`);
+  const each_array_3 = ensure_array_like(steps);
+  for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
+    let step = each_array_3[$$index_3];
+    $$renderer.push(`<div class="flex items-start gap-5"><div class="flex-none w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-bold text-sm">${escape_html(step.n)}</div> <div><h3 class="font-semibold mb-1">${escape_html(step.title)}</h3> <p class="text-base-content/70 text-sm">${escape_html(step.desc)}</p></div></div>`);
+  }
+  $$renderer.push(`<!--]--></div> <div class="text-center mt-12"><a href="/download" class="btn btn-primary btn-lg">Jetzt herunterladen</a></div></div></section> <section class="py-16 px-4 bg-primary/5 border-t border-base-300"><div class="max-w-2xl mx-auto text-center"><div class="text-4xl mb-4">🔒</div> <h2 class="text-2xl font-bold mb-3">Deine Daten gehoren dir</h2> <p class="text-base-content/70 mb-6">API-Schlussel, Style-Einstellungen und Texte verlassen deinen Browser nicht.
+      Kein Account, kein Tracking, kein Server-Backend des Entwicklers.</p> <a href="/docs/privacy" class="link link-primary text-sm">Datenschutzerklarung lesen →</a></div></section>`);
+}
+export {
+  _page as default
+};

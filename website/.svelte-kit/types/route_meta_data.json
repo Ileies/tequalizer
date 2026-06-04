@@ -1,0 +1,21 @@
+{
+	"/": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/docs/faq": [
+		"src/routes/+layout.ts"
+	],
+	"/docs/getting-started": [
+		"src/routes/+layout.ts"
+	],
+	"/docs/privacy": [
+		"src/routes/+layout.ts"
+	],
+	"/docs/style-dimensions": [
+		"src/routes/+layout.ts"
+	],
+	"/download": [
+		"src/routes/+layout.ts"
+	]
+}
