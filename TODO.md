@@ -56,6 +56,10 @@
 - [ ] Per-Site Style-Pinning (z.B. immer Academic auf Wikipedia)
 - [ ] Style Import / Export (JSON)
 
+## Website
+
+- [ ] **Marketing-/Download-/Docs-Website** - separate Website (im Repo unter `website/`) fuer Projektpraesentation, Download-Links zu den Store-Eintraegen und Nutzerdokumentation (Erste Schritte, Style-Dimensionen, FAQ, Datenschutz)
+
 ## Future
 
 - [ ] Rewrite-History / Undo - nach dem Akzeptieren eines Rewrites zurueck zum Original ohne Seiten-Reload
