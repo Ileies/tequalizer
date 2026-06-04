@@ -23,7 +23,7 @@
 - [x] **Empty State Styles-Tab** - Style-Liste zeigt nichts wenn leer; leeren Zustand mit Call-to-Action anzeigen (`StylesTab.svelte`)
 - [x] **Ungespeicherte Aenderungen in KnowledgeTab** - kein Hinweis wenn der Profiltext geaendert aber noch nicht gespeichert wurde; Indicator anzeigen wenn `profileText !== savedText`
 - [x] **Bestaetigung fuer "Verwerfen"** - der Verwerfen-Button im Popup hat keine Bestaetigung; Nutzer koennten versehentlich ausloefen
-- [ ] **Min-Word-Count Input** - negative Werte werden erst nach `onchange` korrigiert, sichtbar fuer den Nutzer; auf `oninput` umstellen (`AutoModeTab.svelte`)
+- [x] **Min-Word-Count Input** - negative Werte werden erst nach `onchange` korrigiert, sichtbar fuer den Nutzer; auf `oninput` umstellen (`AutoModeTab.svelte`)
 - [ ] **Domain-Validierung** - in `AutoModeTab.svelte` werden ungueltige Domain-Eingaben (Leerzeichen, Sonderzeichen) lautlos akzeptiert; regex-Validierung + Warnhinweis hinzufuegen
 - [ ] **Tab-Panel Fokus-Reihenfolge** - versteckte Tab-Panels in `options/App.svelte` haben `tabindex="0"` und sind damit im Tab-Order; auf `tabindex="-1"` fuer inaktive Panels setzen
 

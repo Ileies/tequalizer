@@ -78,6 +78,10 @@
     min="0"
     step="1"
     value={appState.settings.autoRewrite.minWordCount}
+    oninput={(e) => {
+      const val = Math.max(0, Number(e.currentTarget.value));
+      e.currentTarget.value = String(val);
+    }}
     onchange={(e) => {
       const val = Math.max(0, Number(e.currentTarget.value));
       e.currentTarget.value = String(val);
