@@ -4,7 +4,7 @@
 
 - [x] **Session-Storage-Keys als Konstanten** - `'popup_pending'` und `'popup_extract_result'` sind in `popup/App.svelte` als Magic Strings hardcodiert; in `src/constants.ts` auslagern
 - [x] **`as`-Casts durch Zod-Validierung ersetzen** - mehrere unvalidierte Type-Casts in `popup/App.svelte` (Storage-Reads, Message-Responses); Zod-Schemas verwenden
-- [ ] **ESLint a11y-Regeln aktivieren** - `svelte/a11y-click-events-have-key-events` und `svelte/a11y-no-static-element-interactions` sind deaktiviert; als `warn` einschalten
+- [x] **ESLint a11y-Regeln aktivieren** - `svelte/a11y-click-events-have-key-events` und `svelte/a11y-no-static-element-interactions` sind deaktiviert; als `warn` einschalten
 - [ ] **`console.error` hinter DEBUG-Flag** - mehrere `console.error`-Calls in Background/Content-Scripts landen in der Produktionskonsole; auf `DEBUG`-Flag conditionen
 - [ ] **`typecheck`-Script trennen** - `check` fuehrt svelte-check + tsc zusammen aus; separate `typecheck`- und `typecheck:svelte`-Scripts anlegen
 
