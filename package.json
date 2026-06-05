@@ -15,7 +15,9 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "lint": "eslint .",
-    "check": "svelte-check && tsc --noEmit"
+    "typecheck:svelte": "svelte-check",
+    "typecheck": "tsc --noEmit",
+    "check": "bun run typecheck:svelte && bun run typecheck"
   },
   "dependencies": {
     "@mozilla/readability": "^0.5.0",
