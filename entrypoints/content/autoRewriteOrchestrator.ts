@@ -1,6 +1,7 @@
 import { segmentDocument, type Segment } from './domSegmenter.ts';
 import { shouldRewrite } from './segmentClassifier.ts';
 import { showOriginals, showRewritten } from './domSurgeon.ts';
+import { debugError } from '../../src/debug.ts';
 
 const MAX_CONCURRENT = 3;
 
@@ -287,7 +288,7 @@ export async function runAutoRewrite(
         failed += chunk.segments.length;
         banner.reportError(failed);
         banner.updateText(rewritten, totalSegments);
-        console.error('[tequalizer] chunk failed:', e);
+        debugError('[tequalizer] chunk failed:', e);
       }
     },
     controller.signal

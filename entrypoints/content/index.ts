@@ -3,6 +3,7 @@ import { runAutoRewrite } from './autoRewriteOrchestrator.ts';
 import type { ChunkInfo } from './autoRewriteOrchestrator.ts';
 import { ChunkStreamParser } from './chunkStreamParser.ts';
 import { sendMessage } from '../../src/messaging/client.ts';
+import { debugError } from '../../src/debug.ts';
 import { segmentDocument, type Segment } from './domSegmenter.ts';
 import { shouldRewrite } from './segmentClassifier.ts';
 import {
@@ -48,7 +49,7 @@ export default defineContentScript({
             })
             .catch((e) => {
               if (rewriteProgress) rewriteProgress.running = false;
-              console.error(e);
+              debugError(e);
             });
           return false;
         }
@@ -174,7 +175,7 @@ async function chunkRewriter(
         port.disconnect();
         resolve();
       } else if (msg.type === 'REWRITE_ERROR') {
-        console.error('[tequalizer] REWRITE_ERROR:', msg.payload['error']);
+        debugError('[tequalizer] REWRITE_ERROR:', msg.payload['error']);
         for (const seg of segments) restoreOriginal(seg.element);
         port.disconnect();
         reject(new Error(msg.payload['error'] ?? 'Unknown error'));

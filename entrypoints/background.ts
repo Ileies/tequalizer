@@ -4,6 +4,7 @@ import { buildChunkPrompt } from '../src/llm/promptBuilder.ts';
 import type { ChunkSegmentInfo } from '../src/llm/promptBuilder.ts';
 import { buildExtractionPrompt, parseExtractedStyle } from '../src/llm/styleExtractor.ts';
 import type { Message } from '../src/messaging/types.ts';
+import { debugError } from '../src/debug.ts';
 
 export default defineBackground(() => {
   browser.runtime.onMessage.addListener(
@@ -15,7 +16,7 @@ export default defineBackground(() => {
 
   browser.runtime.onConnect.addListener((port) => {
     if (port.name.startsWith('rewrite-')) {
-      handleRewritePort(port).catch(console.error);
+      handleRewritePort(port).catch(debugError);
     }
   });
 });

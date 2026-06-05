@@ -1,5 +1,6 @@
 import { StoredState, INITIAL_STATE } from './schema.ts';
 import { migrate } from './migrations.ts';
+import { debugError } from '../debug.ts';
 
 type Listener = (state: StoredState) => void;
 type StorageChange = { newValue?: unknown; oldValue?: unknown };
@@ -17,7 +18,7 @@ export async function getState(): Promise<StoredState> {
   const parsed = StoredState.safeParse(migrated);
 
   if (!parsed.success) {
-    console.error('[storage] Invalid state, resetting:', parsed.error);
+    debugError('[storage] Invalid state, resetting:', parsed.error);
     await browser.storage.local.set(INITIAL_STATE);
     return INITIAL_STATE;
   }
