@@ -4,11 +4,8 @@
   import type { StoredState, Settings } from '../../../src/storage/schema.ts';
 
   const OPENAI_MODELS: Settings['openaiModel'][] = [
-    'gpt-4.1-mini',
-    'gpt-4.1',
-    'gpt-4o',
-    'gpt-4o-mini',
-    'gpt-5.4-mini',
+    'gpt-6-luna',
+    'gpt-6.1-sol',
   ];
 
   let {

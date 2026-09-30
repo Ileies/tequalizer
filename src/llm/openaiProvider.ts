@@ -46,7 +46,7 @@ export const openaiProvider: LLMProvider = {
     const apiKey = state.settings.apiKeys.openai;
     if (!apiKey) throw new Error('Kein API-Key konfiguriert.');
 
-    const model = state.settings.openaiModel ?? 'gpt-4.1-mini';
+    const model = state.settings.openaiModel ?? 'gpt-6-luna';
 
     // Timeout only for the initial connection; once headers arrive the stream
     // continues uninterrupted (clearTimeout cancels it before the body is read).
@@ -68,7 +68,8 @@ export const openaiProvider: LLMProvider = {
       body: JSON.stringify({
         model,
         stream: true,
-        temperature: req.temperature ?? 0.7,
+        reasoning: { effort: model === 'gpt-6-luna' ? 'none' : 'low' },
+        ...(model === 'gpt-6-luna' ? { temperature: req.temperature ?? 0.7 } : {}),
         max_output_tokens: req.maxTokens ?? 4096,
         instructions: req.systemPrompt,
         input: req.userPrompt,

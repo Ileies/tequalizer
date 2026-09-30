@@ -3,6 +3,16 @@ import { PRESET_STYLES, DEFAULT_STYLE, DEFAULT_STYLE_ID } from './schema.ts';
 
 type Migration = (state: Record<string, unknown>) => Record<string, unknown>;
 
+const LEGACY_OPENAI_MODELS: Record<string, 'gpt-6-luna' | 'gpt-6.1-sol'> = {
+  'gpt-5.6-luna': 'gpt-6-luna',
+  'gpt-4o-mini': 'gpt-6-luna',
+  'gpt-5-mini': 'gpt-6-luna',
+  'gpt-4.1-mini': 'gpt-6-luna',
+  'gpt-5.4-mini': 'gpt-6-luna',
+  'gpt-4o': 'gpt-6.1-sol',
+  'gpt-4.1': 'gpt-6.1-sol',
+};
+
 const MIGRATIONS: Record<number, Migration> = {
   // v1 is the initial schema - no migration needed
   2: (state) => {
@@ -78,12 +88,20 @@ const MIGRATIONS: Record<number, Migration> = {
       }),
     };
   },
+  7: (state) => {
+    const settings = state['settings'];
+    if (typeof settings !== 'object' || settings === null) return state;
+    const previous = (settings as Record<string, unknown>)['openaiModel'];
+    const model = typeof previous === 'string' ? LEGACY_OPENAI_MODELS[previous] : undefined;
+    if (!model) return state;
+    return { ...state, settings: { ...settings, openaiModel: model } };
+  },
 };
 
 export function migrate(raw: Record<string, unknown>): Record<string, unknown> {
   let state = raw;
   const current = typeof state['schemaVersion'] === 'number' ? state['schemaVersion'] : 0;
-  const target = 6;
+  const target = 7;
 
   for (let v = current + 1; v <= target; v++) {
     const migration = MIGRATIONS[v];
@@ -94,4 +112,4 @@ export function migrate(raw: Record<string, unknown>): Record<string, unknown> {
   return state;
 }
 
-export const CURRENT_SCHEMA_VERSION: StoredState['schemaVersion'] = 6;
+export const CURRENT_SCHEMA_VERSION: StoredState['schemaVersion'] = 7;

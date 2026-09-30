@@ -22,17 +22,34 @@ describe('getState', () => {
   });
 
   it('returns valid stored state', async () => {
-    await setState({ settings: { ...INITIAL_STATE.settings, openaiModel: 'gpt-4.1' } });
+    await setState({ settings: { ...INITIAL_STATE.settings, openaiModel: 'gpt-6.1-sol' } });
     const state = await getState();
-    expect(state.settings.openaiModel).toBe('gpt-4.1');
+    expect(state.settings.openaiModel).toBe('gpt-6.1-sol');
+  });
+
+  it('keeps saved settings when migrating an older model choice', async () => {
+    const stored = {
+      ...INITIAL_STATE,
+      schemaVersion: 6,
+      settings: {
+        ...INITIAL_STATE.settings,
+        apiKeys: { openai: 'existing-key' },
+        openaiModel: 'gpt-4o',
+      },
+    };
+    globalThis.chrome.storage.local.get.mockResolvedValueOnce(stored);
+
+    const state = await getState();
+    expect(state.settings.openaiModel).toBe('gpt-6.1-sol');
+    expect(state.settings.apiKeys.openai).toBe('existing-key');
   });
 });
 
 describe('updateSettings', () => {
   it('merges partial settings without overwriting other fields', async () => {
-    await updateSettings({ openaiModel: 'gpt-4o' });
+    await updateSettings({ openaiModel: 'gpt-6.1-sol' });
     const state = await getState();
-    expect(state.settings.openaiModel).toBe('gpt-4o');
+    expect(state.settings.openaiModel).toBe('gpt-6.1-sol');
     expect(state.settings.provider).toBe('openai'); // unchanged
     expect(state.settings.activeStyleId).toBe(DEFAULT_STYLE_ID); // unchanged
   });
@@ -44,7 +61,7 @@ describe('setState', () => {
     const received: unknown[] = [];
     const unsub = subscribe((s) => received.push(s));
 
-    await setState({ settings: { ...INITIAL_STATE.settings, openaiModel: 'gpt-4.1' } });
+    await setState({ settings: { ...INITIAL_STATE.settings, openaiModel: 'gpt-6.1-sol' } });
 
     expect(received).toHaveLength(1);
     unsub();
