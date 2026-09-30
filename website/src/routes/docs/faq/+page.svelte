@@ -6,7 +6,7 @@
   const faqs = [
     {
       q: 'Was kostet Tequalizer?',
-      a: 'Die Extension selbst ist kostenlos. Du benotigst jedoch einen eigenen OpenAI API-Schlussel. Die Kosten dafur hangen von der Nutzung ab - GPT-4o mini (der Standard) ist sehr gunstig und kostet wenige Cent pro mehrseitigem Artikel.'
+      a: 'Die Extension selbst ist kostenlos. Du benotigst jedoch einen eigenen OpenAI API-Schlussel. Die Kosten dafur hangen von der Nutzung ab - GPT-6 Luna (der Standard) ist sehr gunstig und kostet wenige Cent pro mehrseitigem Artikel.'
     },
     {
       q: 'Werden meine Daten gesammelt?',

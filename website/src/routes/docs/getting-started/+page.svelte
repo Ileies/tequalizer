@@ -38,7 +38,7 @@
     <li>Tequalizer-Popup offnen (Extension-Icon anklicken).</li>
     <li>Wenn noch kein API-Schlussel konfiguriert ist, zeigt das Popup einen Einrichtungshinweis - auf "Einstellungen offnen" klicken.</li>
     <li>Im Tab "API & Modell" den OpenAI API-Schlussel eingeben und "Speichern" klicken.</li>
-    <li>Optional: Das Modell wechseln (Standard ist GPT-4o mini).</li>
+    <li>Optional: Das Modell wechseln (Standard ist GPT-6 Luna).</li>
   </ol>
 
   <div class="not-prose bg-base-200 border border-base-300 rounded-lg p-4 text-sm my-4">
